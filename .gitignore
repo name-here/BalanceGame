@@ -1,0 +1,14 @@
+# Import cache
+.import/
+
+# Git plugin files
+bin/
+git_api.gdnlib
+git_api.gdns
+
+#Mac stuff
+*.DS_Store
+
+#Export stuff
+Exports/
+export_presets.cfg
