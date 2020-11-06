@@ -4,8 +4,9 @@ signal torque_changed(value)
 signal tension_changed(value)
 
 
-func _process(_delta):#this seems inefficient, but I don't think there's an _on_resized signal/function/etc.
+func _ready():
 	update_size()
+	get_viewport().connect("size_changed", self, "update_size")
 
 func update_size():
 	rect_size = get_viewport_rect().size

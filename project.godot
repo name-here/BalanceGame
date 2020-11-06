@@ -21,7 +21,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Balance Game"
-run/main_scene="res://Levels/TestLevel1/TestLevel1.tscn"
+run/main_scene="res://Levels/Tutorial_01/Tutorial_01.tscn"
 config/icon="res://icon.png"
 
 [autoload]
@@ -43,7 +43,8 @@ singletons=[ "res://git_api.gdnlib" ]
 
 [gui]
 
-common/snap_controls_to_pixels=false
+theme/use_hidpi=true
+theme/custom="res://Themes/DefaultTheme.tres"
 
 [input]
 
@@ -58,13 +59,19 @@ character_compress={
  ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="player_body"
+2d_physics/layer_2="player_wheel"
+2d_physics/layer_3="floor"
+2d_physics/layer_4="walls"
+
 [physics]
 
 common/physics_fps=240
-2d/default_gravity=300
+2d/default_gravity=150
 
 [rendering]
 
 quality/intended_usage/framebuffer_allocation=0
 quality/intended_usage/framebuffer_allocation.mobile=0
-environment/default_environment="res://default_env.tres"

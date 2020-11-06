@@ -99,7 +99,6 @@ texture = ExtResource( 2 )
 position = Vector2( 1621.68, 184.619 )
 
 [node name="Camera2D" type="Camera2D" parent="Character"]
-current = true
 drag_margin_left = 1.0
 
 [node name="HUD" parent="Character/Camera2D" instance=ExtResource( 4 )]

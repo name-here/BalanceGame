@@ -1,17 +1,127 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Character/Character.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Themes/Fonts/PixelX16.tres" type="DynamicFont" id=3]
+[ext_resource path="res://Levels/Tutorial_01/LevelController.gd" type="Script" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 0.5, 0.5 )
+
+[sub_resource type="Gradient" id=2]
+offsets = PoolRealArray( 0 )
+colors = PoolColorArray( 1, 1, 1, 1 )
+
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
+width = 1
+
+[sub_resource type="Gradient" id=4]
+offsets = PoolRealArray( 0 )
+colors = PoolColorArray( 0.564706, 0.807843, 0.643137, 1 )
+
+[sub_resource type="GradientTexture" id=5]
+gradient = SubResource( 4 )
+width = 1
 
 [node name="Tutorial_01" type="Node2D"]
+script = ExtResource( 4 )
+_character = NodePath("Character")
+_character_label = NodePath("Character/Label")
+_camera = NodePath("Camera2D")
+_goal = NodePath("Geometry/Goal")
+
+[node name="Tween" type="Tween" parent="."]
 
 [node name="Geometry" type="Node2D" parent="."]
 
+[node name="Floor" type="StaticBody2D" parent="Geometry"]
+position = Vector2( 0, 5000 )
+scale = Vector2( 20000, 10000 )
+collision_layer = 4
+collision_mask = 3
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Geometry/Floor"]
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="Geometry/Floor"]
+texture = SubResource( 3 )
+
+[node name="Wall" type="StaticBody2D" parent="Geometry"]
+position = Vector2( -4984, 0 )
+scale = Vector2( 10000, 10000 )
+collision_layer = 8
+collision_mask = 3
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Geometry/Wall"]
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="Geometry/Wall"]
+texture = SubResource( 3 )
+
+[node name="Goal" type="Sprite" parent="Geometry"]
+position = Vector2( 864, 32 )
+scale = Vector2( 256, 64 )
+texture = SubResource( 5 )
+
 [node name="Character" parent="." instance=ExtResource( 1 )]
+position = Vector2( 188, -160 )
+do_compress_input = false
 
-[node name="Camera2D" type="Camera2D" parent="Character"]
-current = true
+[node name="Label" type="Label" parent="Character"]
+margin_left = -160.0
+margin_top = -205.0
+margin_right = 160.0
+margin_bottom = -74.0
+grow_horizontal = 2
+grow_vertical = 0
+custom_fonts/font = ExtResource( 3 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "try not to
+fall over."
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="HUD" parent="Character/Camera2D" instance=ExtResource( 2 )]
-[connection signal="character_tension_changed" from="Character" to="Character/Camera2D/HUD" method="_set_tension"]
-[connection signal="character_torque_changed" from="Character" to="Character/Camera2D/HUD" method="_set_torque"]
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 512, -256 )
+__meta__ = {
+"_edit_group_": true,
+"_edit_lock_": true
+}
+
+[node name="HUD" parent="Camera2D" instance=ExtResource( 2 )]
+
+[node name="Margin" parent="Camera2D/HUD" index="0"]
+custom_constants/margin_right = 40
+custom_constants/margin_top = 40
+custom_constants/margin_left = 40
+custom_constants/margin_bottom = 40
+
+[node name="Inset" parent="Camera2D/HUD/Margin" index="0"]
+margin_left = 40.0
+margin_top = 40.0
+margin_right = 984.0
+margin_bottom = 984.0
+
+[node name="Torque" parent="Camera2D/HUD/Margin/Inset" index="0"]
+anchor_left = 0.0
+anchor_right = 1.0
+margin_left = 40.0
+margin_top = -60.0
+margin_right = -40.0
+margin_bottom = 6.10352e-05
+
+[node name="Tension" parent="Camera2D/HUD/Margin/Inset" index="1"]
+visible = false
+[connection signal="body_hit_floor" from="Character" to="." method="restart"]
+[connection signal="character_torque_changed" from="Character" to="Camera2D/HUD" method="_set_torque"]
+
+[editable path="Camera2D/HUD"]
