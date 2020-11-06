@@ -30,6 +30,7 @@ _character = NodePath("Character")
 _character_label = NodePath("Character/Label")
 _camera = NodePath("Camera2D")
 _goal = NodePath("Geometry/Goal")
+_tween = NodePath("Tween")
 
 [node name="Tween" type="Tween" parent="."]
 
