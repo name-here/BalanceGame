@@ -41,7 +41,6 @@ func _ready():
 func load(request:LoadRequest, high_priority:bool = false):
 	if ResourceLoader.has_cached(request.path):
 		call_deferred( "_callback_complete", request, ResourceLoader.load(request.path) )
-		print("returned cached resource")
 		return
 	request_queue_mutex.lock()
 	if high_priority:

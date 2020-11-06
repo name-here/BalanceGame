@@ -24,7 +24,7 @@ export(bool) var do_compress_input := true
 # Mouse position is scaled based on viewport size (-1 to 1), with (0, 0) at the center
 var mouse_pos := Vector2()
 export(float) var sensitivity:float = 40000
-export(float) var friction:float = 0.05
+export(float) var friction:float = 0.02
 
 var tension:float = 0 setget _set_tension
 export(float) var max_tension:float = 0.95

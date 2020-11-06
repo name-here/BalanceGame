@@ -1,5 +1,7 @@
 extends Node
 
+class_name SceneLoader
+
 
 signal progress_changed(percent)
 signal scene_loaded
