@@ -105,15 +105,7 @@ __meta__ = {
 
 [node name="HUD" parent="Camera2D" instance=ExtResource( 2 )]
 
-[node name="RewindOverlay" type="ColorRect" parent="Camera2D/HUD"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color( 0.635294, 0.827451, 0.87451, 0 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Margin" parent="Camera2D/HUD" index="1"]
+[node name="Margin" parent="Camera2D/HUD" index="0"]
 custom_constants/margin_right = 40
 custom_constants/margin_top = 40
 custom_constants/margin_left = 40
@@ -135,6 +127,14 @@ margin_bottom = 6.10352e-05
 
 [node name="Tension" parent="Camera2D/HUD/Margin/Inset" index="1"]
 visible = false
+
+[node name="RewindOverlay" type="ColorRect" parent="Camera2D/HUD"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.635294, 0.827451, 0.87451, 0 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="CompletedText" type="Label" parent="Camera2D/HUD"]
 anchor_right = 1.0

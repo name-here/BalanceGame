@@ -75,6 +75,8 @@ func _process(delta):
 				body_rotations = PoolRealArray()
 				wheel_positions = PoolVector2Array()
 				wheel_rotations = PoolRealArray()
+				print("running here")
+				level_state = states.PAUSED
 				tween.interpolate_property(rewind_overlay, "color:a", rewind_overlay.color.a, 0, 0.5)
 				tween.interpolate_deferred_callback(self, 0.5, "play")
 				tween.start()
@@ -85,7 +87,6 @@ func pause() -> void:
 	level_state = states.PAUSED
 
 func play() -> void:
-	print("playing")
 	set_physics(true)
 	level_state = states.PLAYING
 
