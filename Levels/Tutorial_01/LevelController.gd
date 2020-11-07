@@ -12,6 +12,9 @@ onready var character_label:Label = get_node(_character_label)
 export(NodePath) var _completed_text:NodePath
 onready var completed_text:Label = get_node(_completed_text)
 
+export(NodePath) var _rewind_overlay:NodePath
+onready var rewind_overlay:ColorRect = get_node(_rewind_overlay)
+
 export(NodePath) var _tween:NodePath
 onready var tween:Tween = get_node(_tween)
 
@@ -72,9 +75,19 @@ func _process(delta):
 				body_rotations = PoolRealArray()
 				wheel_positions = PoolVector2Array()
 				wheel_rotations = PoolRealArray()
-				set_physics(true)
-				level_state = states.PLAYING
+				tween.interpolate_property(rewind_overlay, "color:a", rewind_overlay.color.a, 0, 0.5)
+				tween.interpolate_deferred_callback(self, 0.5, "play")
+				tween.start()
 
+
+func pause() -> void:
+	set_physics(false)
+	level_state = states.PAUSED
+
+func play() -> void:
+	print("playing")
+	set_physics(true)
+	level_state = states.PLAYING
 
 func restart(time:float = 1, override:bool = false):
 	if override or level_state == states.PLAYING:
@@ -85,6 +98,8 @@ func restart(time:float = 1, override:bool = false):
 		character.wheel.linear_velocity = Vector2(0, 0)
 		rewind_length = time
 		rewind_time = rewind_length
+		tween.interpolate_property(rewind_overlay, "color:a", 0, 0.15, 0.1)
+		tween.start()
 		level_state = states.RESTARTING
 	else:
 		match level_state:
@@ -103,7 +118,7 @@ func restart(time:float = 1, override:bool = false):
 				tween.interpolate_deferred_callback(self, time/2, "restart", time/2, true)
 				tween.start()
 
-func next_complete_anim():
+func next_complete_anim() -> void:
 	if level_state >= states.COMPLETE_1:
 		if level_state < states.size() - 1:
 			level_state += 1
@@ -145,7 +160,7 @@ func set_active(value := true):
 		_on_window_resize()
 		camera.make_current()
 		level_state = states.PLAYING
-		#get_viewport().connect("size_changed", self, "_on_window_resize")
+		get_viewport().connect("size_changed", self, "_on_window_resize")
 	else:
 		level_state = states.INACTIVE
 
@@ -178,6 +193,10 @@ func _input(event):
 				restart(0.5)
 			states.COMPLETE_3:
 				restart(2)
+	elif event.is_action_pressed("toggle_fullscreen"):
+		OS.window_fullscreen = !OS.window_fullscreen
+	elif event.is_action_pressed("toggle_fullscreen"):
+		OS.window_fullscreen = false
 
 func _on_window_resize():
 	camera.position.x = get_viewport_rect().size.x / 2
