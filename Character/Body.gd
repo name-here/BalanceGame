@@ -1,6 +1,8 @@
 extends RigidBody2D
 
+
 signal hit_floor
+
 
 func _integrate_forces(state):
 	for i in range( state.get_contact_count() ):

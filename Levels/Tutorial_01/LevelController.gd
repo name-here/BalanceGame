@@ -6,6 +6,10 @@ export(NodePath) var _camera:NodePath
 onready var camera:Camera2D = get_node(_camera)
 export(NodePath) var _goal:NodePath
 onready var goal:Sprite = get_node(_goal)
+export(NodePath) var _floor_:NodePath
+onready var floor_:StaticBody2D = get_node(_floor_)
+export(NodePath) var _wall:NodePath
+onready var wall:StaticBody2D = get_node(_wall)
 
 export(NodePath) var _character_label:NodePath
 onready var character_label:Label = get_node(_character_label)
@@ -18,7 +22,7 @@ onready var rewind_overlay:ColorRect = get_node(_rewind_overlay)
 export(NodePath) var _tween:NodePath
 onready var tween:Tween = get_node(_tween)
 
-const completion_anim_times := [1.5, 1]
+export(Array, float) var completion_anim_times := [1.5, 1.0]
 
 enum states{
 	INACTIVE,
@@ -33,12 +37,23 @@ var level_state:int = states.INACTIVE
 
 var rewind_length:float = 1#number of seconds it takes to rewind
 var rewind_time:float = 1#number of seconds left for rewind
-var body_positions:PoolVector2Array
-var body_rotations:PoolRealArray
-var wheel_positions:PoolVector2Array
-var wheel_rotations:PoolRealArray
+onready var body_positions:PoolVector2Array = [character.body.global_position]
+var body_positions_init:PoolVector2Array
+onready var body_rotations:PoolRealArray = [character.body.global_rotation]
+var body_rotations_init:PoolRealArray
+onready var wheel_positions:PoolVector2Array = [character.wheel.global_position]
+var wheel_positions_init:PoolVector2Array
+onready var wheel_rotations:PoolRealArray = [character.wheel.global_rotation]
+var wheel_rotations_init:PoolRealArray
 
 func _ready():
+	for time in completion_anim_times:
+		assert(time > 0)
+	
+	body_positions_init = body_positions
+	body_rotations_init = body_rotations
+	wheel_positions_init = wheel_positions
+	wheel_rotations_init = wheel_rotations
 	set_active()
 
 
@@ -66,20 +81,57 @@ func _process(delta):
 					rewind_time -= delta
 			else:
 				rewind_time = 0
+				body_positions = body_positions_init
+				body_rotations = body_rotations_init
+				wheel_positions = wheel_positions_init
+				wheel_rotations = wheel_rotations_init
 				if body_positions.size() > 0:
 					character.body.global_position = body_positions[0]
 					character.body.global_rotation = body_rotations[0]
 					character.wheel.global_position = wheel_positions[0]
 					character.wheel.global_rotation = wheel_rotations[0]
-				body_positions = PoolVector2Array()
-				body_rotations = PoolRealArray()
-				wheel_positions = PoolVector2Array()
-				wheel_rotations = PoolRealArray()
-				print("running here")
 				level_state = states.PAUSED
 				tween.interpolate_property(rewind_overlay, "color:a", rewind_overlay.color.a, 0, 0.5)
 				tween.interpolate_deferred_callback(self, 0.5, "play")
 				tween.start()
+		#states.COMPLETE_2:
+		#	print("stage 2, ", character.body.global_position, ", ", character.wheel.global_position)
+
+
+func next_complete_anim() -> void:
+	if level_state < states.COMPLETE_1:
+		level_state = states.COMPLETE_1
+	elif level_state < states.size() - 1:
+		level_state += 1
+	
+	#print("asked for stage ", states.keys()[level_state])
+	
+	match level_state:
+		states.COMPLETE_1:
+			tween.interpolate_property(camera, "global_position:x",
+				camera.global_position.x, goal.global_position.x, completion_anim_times[0], Tween.TRANS_CUBIC)
+			tween.interpolate_method(self, "set_character_label_color",
+				Color(1, 1, 1, 1), Color(1, 1, 1, 0), completion_anim_times[0])
+			tween.interpolate_property(Engine, "time_scale", Engine.time_scale, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
+			#tween.interpolate_callback(self, completion_anim_times[0], "reset_timescales")
+			#tween.interpolate_callback(self, completion_anim_times[0], "set_physics", false)
+			tween.interpolate_callback(self, completion_anim_times[0], "next_complete_anim")
+			tween.ignore_engine_timescale = true
+			tween.start()
+		
+		states.COMPLETE_2:
+			#reset_timescales()
+			set_physics(false)
+			tween.remove_all()
+			character.update_origin()
+			tween.interpolate_method(self, "set_character_state",
+				Vector3(character.global_position.x, character.global_position.y, character.body.global_rotation),
+				Vector3(goal.global_position.x, -192, 0),
+				completion_anim_times[1], Tween.TRANS_CUBIC)
+			tween.interpolate_method(self, "set_completed_text_color",
+				Color(1, 1, 1, 0), Color(1, 1, 1, 1), completion_anim_times[1])
+			tween.interpolate_callback(self, completion_anim_times[1], "next_complete_anim")
+			tween.start()
 
 
 func pause() -> void:
@@ -91,6 +143,9 @@ func play() -> void:
 	level_state = states.PLAYING
 
 func restart(time:float = 1, override:bool = false):
+	if time <= 0:
+		assert(time > 0)
+		time = 1.0
 	if override or level_state == states.PLAYING:
 		set_physics(false)
 		character.body.angular_velocity = 0
@@ -105,6 +160,7 @@ func restart(time:float = 1, override:bool = false):
 	else:
 		match level_state:
 			states.COMPLETE_3:
+				level_state = states.PAUSED
 				var last = body_positions.size() - 1
 				tween.interpolate_method(self, "set_completed_text_color",
 					Color(1, 1, 1, 1), Color(1, 1, 1, 0), time/2, Tween.TRANS_EXPO, Tween.EASE_OUT)
@@ -118,38 +174,6 @@ func restart(time:float = 1, override:bool = false):
 					camera.global_position.x, get_viewport_rect().size.x / 2, time/2, Tween.TRANS_CUBIC)
 				tween.interpolate_deferred_callback(self, time/2, "restart", time/2, true)
 				tween.start()
-
-func next_complete_anim() -> void:
-	if level_state >= states.COMPLETE_1:
-		if level_state < states.size() - 1:
-			level_state += 1
-	else:
-		level_state = states.COMPLETE_1
-	
-	match level_state:
-		states.COMPLETE_1:
-			tween.interpolate_property(camera, "global_position:x",
-				camera.global_position.x, goal.global_position.x, completion_anim_times[0], Tween.TRANS_CUBIC)
-			tween.interpolate_method(self, "set_character_label_color",
-				Color(1, 1, 1, 1), Color(1, 1, 1, 0), completion_anim_times[0])
-			tween.interpolate_property(Engine, "time_scale", Engine.time_scale, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
-			tween.interpolate_callback(self, completion_anim_times[0], "reset_timescales")
-			tween.interpolate_deferred_callback(self, completion_anim_times[0], "next_complete_anim")
-			tween.ignore_engine_timescale = true
-			tween.start()
-		
-		states.COMPLETE_2:
-			set_physics(false)
-			tween.remove_all()
-			character.update_origin()
-			tween.interpolate_method(self, "set_character_state",
-				Vector3(character.global_position.x, character.global_position.y, character.body.global_rotation),
-				Vector3(goal.global_position.x, -192, 0),
-				completion_anim_times[1], Tween.TRANS_CUBIC)
-			tween.interpolate_method(self, "set_completed_text_color",
-				Color(1, 1, 1, 0), Color(1, 1, 1, 1), completion_anim_times[1])
-			tween.interpolate_deferred_callback(self, completion_anim_times[1], "next_complete_anim")
-			tween.start()
 
 
 func set_physics(value:bool):
@@ -181,14 +205,15 @@ func set_character_label_color(color:Color):
 func set_completed_text_color(color:Color):
 	completed_text.set("custom_colors/font_color", color)
 
-func reset_timescales():
-	tween.ignore_engine_timescale = false
-	tween.playback_speed = 1
-	Engine.time_scale = 1
+#func reset_timescales():
+#	tween.ignore_engine_timescale = false
+#	tween.playback_speed = 1
+#	Engine.time_scale = 1
 
 
 func _input(event):
 	if event.is_action_pressed("reset_level"):
+		#print(states.keys()[level_state])
 		match level_state:
 			states.PLAYING:
 				restart(0.5)
@@ -200,5 +225,10 @@ func _input(event):
 		OS.window_fullscreen = false
 
 func _on_window_resize():
-	camera.position.x = get_viewport_rect().size.x / 2
-	goal.position.x = get_viewport_rect().size.x - 160
+	var new_size:Vector2 = get_viewport_rect().size
+	camera.position.x = new_size.x / 2
+	floor_.scale = Vector2(new_size.x * 2, new_size.y / 2 - 256)
+	floor_.position = floor_.scale / 2
+	wall.scale.y = new_size.y / 2 + 256
+	wall.position.y = -wall.scale.y / 2
+	goal.position.x = new_size.x - 160
