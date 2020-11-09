@@ -1,13 +1,12 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Character/Character.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=3]
 [ext_resource path="res://Levels/Tutorial_01/LevelController.gd" type="Script" id=4]
 [ext_resource path="res://Levels/Tutorial_01/Tween.gd" type="Script" id=5]
-[ext_resource path="res://Interface/ColorBackground/ColorBackground.tscn" type="PackedScene" id=6]
-[ext_resource path="res://Themes/Fonts/PixelX16_128.tres" type="DynamicFont" id=7]
-[ext_resource path="res://Themes/Fonts/PixelX16_96.tres" type="DynamicFont" id=8]
+[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=7]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 0.5, 0.5 )
@@ -43,9 +42,12 @@ _goal = NodePath("Geometry/Goal")
 _floor_ = NodePath("Geometry/Floor")
 _wall = NodePath("Geometry/Wall")
 _character_label = NodePath("Character/Label")
-_end_texts = [ NodePath("Camera2D/HUD/CompleteScreen/VBoxContainer/CompletedText"), NodePath("Camera2D/HUD/CompleteScreen/VBoxContainer/HBoxContainer/Replay/Label"), NodePath("Camera2D/HUD/CompleteScreen/VBoxContainer/HBoxContainer/Continue/Label") ]
+_end_screen = NodePath("Camera2D/HUD/EndScreen")
 _rewind_overlay = NodePath("Camera2D/HUD/RewindOverlay")
 _tween = NodePath("Tween")
+
+[node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
+color = Color( 0.196078, 0.196078, 0.196078, 1 )
 
 [node name="Tween" type="Tween" parent="."]
 playback_process_mode = 0
@@ -113,13 +115,8 @@ __meta__ = {
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 512, -256 )
 __meta__ = {
-"_edit_group_": true,
 "_edit_lock_": true
 }
-
-[node name="ColorBackground" parent="Camera2D" instance=ExtResource( 6 )]
-visible = false
-color = Color( 0.196078, 0.196078, 0.196078, 1 )
 
 [node name="HUD" parent="Camera2D" instance=ExtResource( 2 )]
 
@@ -154,91 +151,11 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CompleteScreen" type="MarginContainer" parent="Camera2D/HUD"]
-anchor_right = 1.0
-custom_constants/margin_right = 0
-custom_constants/margin_top = 64
-custom_constants/margin_left = 0
-custom_constants/margin_bottom = 64
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Camera2D/HUD/CompleteScreen"]
-margin_top = 64.0
-margin_right = 1024.0
-margin_bottom = 462.0
-size_flags_horizontal = 3
-
-[node name="CompletedText" type="Label" parent="Camera2D/HUD/CompleteScreen/VBoxContainer"]
-margin_right = 1024.0
-margin_bottom = 262.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme = ExtResource( 3 )
-custom_fonts/font = ExtResource( 7 )
-custom_colors/font_color = Color( 1, 1, 1, 0 )
-text = "Level
-Complete"
-align = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Camera2D/HUD/CompleteScreen/VBoxContainer"]
-margin_top = 270.0
-margin_right = 1024.0
-margin_bottom = 398.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Replay" type="MarginContainer" parent="Camera2D/HUD/CompleteScreen/VBoxContainer/HBoxContainer"]
-margin_right = 462.0
-margin_bottom = 128.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-custom_constants/margin_right = 16
-custom_constants/margin_top = 32
-custom_constants/margin_left = 16
-
-[node name="Label" type="Label" parent="Camera2D/HUD/CompleteScreen/VBoxContainer/HBoxContainer/Replay"]
-margin_left = 16.0
-margin_top = 32.0
-margin_right = 446.0
-margin_bottom = 128.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme = ExtResource( 3 )
-custom_fonts/font = ExtResource( 8 )
-custom_colors/font_color = Color( 0.972549, 0.741176, 0, 0 )
-text = "[Replay]"
-align = 1
-valign = 1
-
-[node name="Continue" type="MarginContainer" parent="Camera2D/HUD/CompleteScreen/VBoxContainer/HBoxContainer"]
-margin_left = 470.0
-margin_right = 1024.0
-margin_bottom = 128.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-custom_constants/margin_right = 16
-custom_constants/margin_top = 32
-custom_constants/margin_left = 16
-
-[node name="Label" type="Label" parent="Camera2D/HUD/CompleteScreen/VBoxContainer/HBoxContainer/Continue"]
-margin_left = 16.0
-margin_top = 32.0
-margin_right = 538.0
-margin_bottom = 128.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme = ExtResource( 3 )
-custom_fonts/font = ExtResource( 8 )
-custom_colors/font_color = Color( 0.517647, 0.839216, 0.623529, 0 )
-text = "[Continue]"
-align = 1
-valign = 1
+[node name="EndScreen" parent="Camera2D/HUD" instance=ExtResource( 7 )]
+visible = false
+alpha = 0.0
 [connection signal="body_hit_floor" from="Character" to="." method="restart"]
 [connection signal="character_torque_changed" from="Character" to="Camera2D/HUD" method="_set_torque"]
+[connection signal="replay_pressed" from="Camera2D/HUD/EndScreen" to="." method="restart" flags=3 binds= [ 2.0 ]]
 
 [editable path="Camera2D/HUD"]

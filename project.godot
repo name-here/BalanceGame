@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "MarginContainer",
+"class": "EndScreen",
+"language": "GDScript",
+"path": "res://Interface/EndScreen/EndScreen.gd"
+}, {
 "base": "",
 "class": "GitAPI",
 "language": "NativeScript",
@@ -20,6 +25,7 @@ _global_script_classes=[ {
 "path": "res://Levels/SceneLoader/SceneLoader.gd"
 } ]
 _global_script_class_icons={
+"EndScreen": "",
 "GitAPI": "",
 "SceneLoader": ""
 }
@@ -93,3 +99,4 @@ quality/driver/driver_name="GLES2"
 quality/intended_usage/framebuffer_allocation=0
 quality/intended_usage/framebuffer_allocation.mobile=0
 vram_compression/import_etc=true
+environment/default_clear_color=Color( 0.196078, 0.196078, 0.196078, 1 )

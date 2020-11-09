@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.gd" type="Script" id=1]
+
+[node name="BackgroundColor" type="CanvasLayer"]
+layer = -1
+script = ExtResource( 1 )
+_color_rect = NodePath("ColorRect")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}

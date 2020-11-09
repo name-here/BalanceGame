@@ -13,8 +13,9 @@ onready var wall:StaticBody2D = get_node(_wall)
 
 export(NodePath) var _character_label:NodePath
 onready var character_label:Label = get_node(_character_label)
-export(Array, NodePath) var _end_texts:Array
-var end_texts:Array
+
+export(NodePath) var _end_screen:NodePath
+onready var end_screen:EndScreen = get_node(_end_screen)
 
 export(NodePath) var _rewind_overlay:NodePath
 onready var rewind_overlay:ColorRect = get_node(_rewind_overlay)
@@ -49,12 +50,6 @@ var wheel_rotations_init:PoolRealArray
 func _ready():
 	for time in completion_anim_times:
 		assert(time > 0)
-	
-	for i in _end_texts.size():
-		assert(_end_texts[i] is NodePath)
-		end_texts.append( get_node(_end_texts[i]) )
-		assert(end_texts[i] is Label)
-		
 	
 	body_positions_init = body_positions
 	body_rotations_init = body_rotations
@@ -134,10 +129,13 @@ func next_complete_anim() -> void:
 				Vector3(character.global_position.x, character.global_position.y, character.body.global_rotation),
 				Vector3(goal.global_position.x, -192, 0),
 				completion_anim_times[1], Tween.TRANS_CUBIC)
-			tween.interpolate_method(self, "set_completed_text_alpha",
+			tween.interpolate_method(end_screen, "set_alpha",
 				0, 1, completion_anim_times[1])
+			end_screen.set_alpha(1)
 			tween.interpolate_callback(self, completion_anim_times[1], "next_complete_anim")
 			tween.start()
+		states.COMPLETE_3:
+			end_screen.active = true
 
 
 func pause() -> void:
@@ -168,8 +166,9 @@ func restart(time:float = 1, override:bool = false):
 			states.COMPLETE_3:
 				level_state = states.PAUSED
 				var last = body_positions.size() - 1
-				tween.interpolate_method(self, "set_completed_text_color",
-					Color(1, 1, 1, 1), Color(1, 1, 1, 0), time/2, Tween.TRANS_EXPO, Tween.EASE_OUT)
+				end_screen.active = false
+				tween.interpolate_method(end_screen, "set_alpha",
+					1, 0, time/2, Tween.TRANS_EXPO, Tween.EASE_OUT)
 				tween.interpolate_method(self, "set_character_state",
 					Vector3(character.global_position.x, character.global_position.y, character.body.global_rotation),
 					Vector3(body_positions[last].x, body_positions[last].y, body_rotations[last]),
@@ -207,12 +206,6 @@ func set_character_state(new_state:Vector3):#sets position and rotation (pos.x, 
 
 func set_character_label_color(color:Color):
 	character_label.set("custom_colors/font_color", color)
-
-func set_completed_text_alpha(alpha:float):
-	for text in end_texts:
-		var target_color:Color = text.get_color("font_color", "Label")
-		target_color.a = alpha
-		text.add_color_override("font_color", target_color)
 
 #func reset_timescales():
 #	tween.ignore_engine_timescale = false
