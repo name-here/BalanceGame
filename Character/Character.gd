@@ -1,10 +1,12 @@
 extends Node2D
 
+class_name Character
+
 
 signal character_torque_changed(value)
 signal character_tension_changed(value)
 
-signal body_hit_floor
+signal body_hit_floor(collision_point, collision_normal)
 
 export(NodePath) var _followed:NodePath
 onready var followed:Node2D = get_node(_followed)
@@ -84,5 +86,5 @@ func update_origin():
 		position += offset
 
 
-func _body_hit_floor():
-	emit_signal("body_hit_floor")
+func _on_body_hit_floor(collision_point:Vector2, collision_normal:Vector2):
+	emit_signal("body_hit_floor", collision_point, collision_normal)

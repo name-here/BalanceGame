@@ -1,0 +1,96 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://Levels/Tutorial_02/Tutorial_02.gd" type="Script" id=1]
+[ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/Floor/Floor.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Character/Character.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Levels/LevelController/LevelController.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Levels/Tutorial_02/Arrow.png" type="Texture" id=9]
+
+[node name="Tutorial_02" type="Node2D"]
+script = ExtResource( 1 )
+_level_controller = NodePath("LevelController")
+_goal = NodePath("Geometry/Goal")
+_left_wall = NodePath("Geometry/LeftWall")
+_floor_ = NodePath("Geometry/Floor")
+
+[node name="LevelController" parent="." instance=ExtResource( 8 )]
+_character = NodePath("../Character")
+_camera = NodePath("../Character/Camera2D")
+_end_screen = NodePath("../HUD/EndScreen")
+_rewind_overlay = NodePath("../HUD/RewindOverlay")
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="LeftWall" parent="Geometry" instance=ExtResource( 5 )]
+position = Vector2( -480, -384 )
+scale = Vector2( 64, 768 )
+
+[node name="Floor" parent="Geometry" instance=ExtResource( 3 )]
+position = Vector2( 1024, 0 )
+scale = Vector2( 3072, 256 )
+
+[node name="Start" parent="Geometry" instance=ExtResource( 2 )]
+script = null
+
+[node name="Goal" parent="Geometry" instance=ExtResource( 2 )]
+position = Vector2( 2048, 0 )
+_character = NodePath("../../Character")
+
+[node name="Arrows" type="Node2D" parent="Geometry"]
+
+[node name="Arrow1" type="Sprite" parent="Geometry/Arrows"]
+position = Vector2( 440, 0 )
+scale = Vector2( 4, 4 )
+texture = ExtResource( 9 )
+offset = Vector2( 0, 8 )
+
+[node name="Arrow2" type="Sprite" parent="Geometry/Arrows"]
+position = Vector2( 952, 0 )
+scale = Vector2( 4, 4 )
+texture = ExtResource( 9 )
+offset = Vector2( 0, 8 )
+
+[node name="Arrow3" type="Sprite" parent="Geometry/Arrows"]
+position = Vector2( 1464, 0 )
+scale = Vector2( 4, 4 )
+texture = ExtResource( 9 )
+offset = Vector2( 0, 8 )
+
+[node name="Character" parent="." instance=ExtResource( 6 )]
+position = Vector2( 0, -160 )
+
+[node name="Camera2D" type="Camera2D" parent="Character"]
+position = Vector2( 0, -96 )
+
+[node name="HUD" parent="." instance=ExtResource( 4 )]
+
+[node name="RewindOverlay" type="ColorRect" parent="HUD"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.635294, 0.827451, 0.87451, 0 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="EndScreen" parent="HUD" instance=ExtResource( 7 )]
+visible = false
+alpha = 0.0
+
+[node name="Background" parent="HUD/EndScreen" index="0"]
+margin_bottom = 1024.0
+
+[node name="VBoxContainer" parent="HUD/EndScreen/MarginContainer" index="0"]
+margin_bottom = 1024.0
+[connection signal="on_restart" from="LevelController" to="." method="_on_level_on_restart"]
+[connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
+[connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
+[connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
+[connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]
+[connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
+[connection signal="restart_pressed" from="HUD/EndScreen" to="LevelController" method="restart" flags=3 binds= [ 2.0 ]]
+
+[editable path="HUD/EndScreen"]

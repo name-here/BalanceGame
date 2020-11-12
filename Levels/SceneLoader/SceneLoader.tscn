@@ -4,4 +4,5 @@
 
 [node name="SceneLoader" type="Node"]
 script = ExtResource( 1 )
-scenes = [ "res://Levels/TestLevel1/TestLevel1.tscn" ]
+scenes_folder = "res://Levels/"
+scenes = [ "Tutorial_01", "Tutorial_02" ]

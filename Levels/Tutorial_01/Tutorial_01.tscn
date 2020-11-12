@@ -1,105 +1,57 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Character/Character.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=3]
-[ext_resource path="res://Levels/Tutorial_01/LevelController.gd" type="Script" id=4]
-[ext_resource path="res://Levels/Tutorial_01/Tween.gd" type="Script" id=5]
+[ext_resource path="res://Levels/LevelController/LevelController.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Levels/Tutorial_01/Tutorial_01.gd" type="Script" id=5]
 [ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=7]
-
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 0.5, 0.5 )
-
-[sub_resource type="Gradient" id=2]
-offsets = PoolRealArray( 0 )
-colors = PoolColorArray( 1, 1, 1, 1 )
-
-[sub_resource type="GradientTexture" id=3]
-gradient = SubResource( 2 )
-width = 1
-
-[sub_resource type="Gradient" id=4]
-offsets = PoolRealArray( 0 )
-colors = PoolColorArray( 0.564706, 0.807843, 0.643137, 1 )
-
-[sub_resource type="GradientTexture" id=5]
-gradient = SubResource( 4 )
-width = 1
-
-[sub_resource type="Gradient" id=6]
-colors = PoolColorArray( 0.580392, 0.831373, 0.658824, 0.337255, 0.568627, 0.811765, 0.643137, 0 )
-
-[sub_resource type="GradientTexture" id=7]
-gradient = SubResource( 6 )
-width = 2
+[ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Objects/Floor/Floor.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=10]
 
 [node name="Tutorial_01" type="Node2D"]
-script = ExtResource( 4 )
+script = ExtResource( 5 )
+_level_controller = NodePath("LevelController")
 _character = NodePath("Character")
 _camera = NodePath("Camera2D")
 _goal = NodePath("Geometry/Goal")
 _floor_ = NodePath("Geometry/Floor")
 _wall = NodePath("Geometry/Wall")
 _character_label = NodePath("Character/Label")
-_end_screen = NodePath("Camera2D/HUD/EndScreen")
-_rewind_overlay = NodePath("Camera2D/HUD/RewindOverlay")
-_tween = NodePath("Tween")
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
-color = Color( 0.196078, 0.196078, 0.196078, 1 )
+color = Color( 0.192157, 0.192157, 0.192157, 1 )
 
-[node name="Tween" type="Tween" parent="."]
-playback_process_mode = 0
-script = ExtResource( 5 )
+[node name="LevelController" parent="." instance=ExtResource( 4 )]
+_character = NodePath("../Character")
+_camera = NodePath("../Camera2D")
+_end_screen = NodePath("../HUD/Frame/EndScreen")
+_rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
 
 [node name="Geometry" type="Node2D" parent="."]
 
-[node name="Floor" type="StaticBody2D" parent="Geometry"]
-position = Vector2( 512, 128 )
+[node name="Floor" parent="Geometry" instance=ExtResource( 9 )]
+position = Vector2( 512, 0 )
 scale = Vector2( 1024, 256 )
-collision_layer = 4
-collision_mask = 3
-__meta__ = {
-"_edit_group_": true
-}
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Geometry/Floor"]
-shape = SubResource( 1 )
-
-[node name="Sprite" type="Sprite" parent="Geometry/Floor"]
-texture = SubResource( 3 )
-
-[node name="Wall" type="StaticBody2D" parent="Geometry"]
+[node name="Wall" parent="Geometry" instance=ExtResource( 10 )]
 position = Vector2( 8, -384 )
 scale = Vector2( 16, 768 )
-collision_layer = 8
-collision_mask = 3
-__meta__ = {
-"_edit_group_": true
-}
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Geometry/Wall"]
-shape = SubResource( 1 )
-
-[node name="Sprite" type="Sprite" parent="Geometry/Wall"]
-texture = SubResource( 3 )
-
-[node name="Goal" type="Sprite" parent="Geometry"]
-position = Vector2( 864, 32 )
-scale = Vector2( 256, 64 )
-texture = SubResource( 5 )
-
-[node name="Sprite" type="Sprite" parent="Geometry/Goal"]
-position = Vector2( 0, -1.5 )
-rotation = -1.5708
-texture = SubResource( 7 )
+[node name="Goal" parent="Geometry" instance=ExtResource( 8 )]
+position = Vector2( 864, 0 )
+_character = NodePath("../../Character")
 
 [node name="Character" parent="." instance=ExtResource( 1 )]
 position = Vector2( 160, -160 )
 do_compress_input = false
 
 [node name="Label" type="Label" parent="Character"]
+margin_left = -136.0
+margin_top = -214.0
+margin_right = 136.0
 margin_bottom = -80.0
 grow_horizontal = 2
 grow_vertical = 0
@@ -118,32 +70,12 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="HUD" parent="Camera2D" instance=ExtResource( 2 )]
+[node name="HUD" parent="." instance=ExtResource( 2 )]
 
-[node name="Margin" parent="Camera2D/HUD" index="0"]
-custom_constants/margin_right = 40
-custom_constants/margin_top = 40
-custom_constants/margin_left = 40
-custom_constants/margin_bottom = 40
-
-[node name="Inset" parent="Camera2D/HUD/Margin" index="0"]
-margin_left = 40.0
-margin_top = 40.0
-margin_right = 984.0
-margin_bottom = 984.0
-
-[node name="Torque" parent="Camera2D/HUD/Margin/Inset" index="0"]
-anchor_left = 0.0
-anchor_right = 1.0
-margin_left = 40.0
-margin_top = -60.0
-margin_right = -40.0
-margin_bottom = 6.10352e-05
-
-[node name="Tension" parent="Camera2D/HUD/Margin/Inset" index="1"]
+[node name="Tension" parent="HUD/Frame/Margin/Inset" index="1"]
 visible = false
 
-[node name="RewindOverlay" type="ColorRect" parent="Camera2D/HUD"]
+[node name="RewindOverlay" type="ColorRect" parent="HUD/Frame" index="1"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color( 0.635294, 0.827451, 0.87451, 0 )
@@ -151,11 +83,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="EndScreen" parent="Camera2D/HUD" instance=ExtResource( 7 )]
+[node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
 visible = false
 alpha = 0.0
-[connection signal="body_hit_floor" from="Character" to="." method="restart"]
-[connection signal="character_torque_changed" from="Character" to="Camera2D/HUD" method="_set_torque"]
-[connection signal="replay_pressed" from="Camera2D/HUD/EndScreen" to="." method="restart" flags=3 binds= [ 2.0 ]]
+[connection signal="on_restart" from="LevelController" to="." method="_on_restart"]
+[connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
+[connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
+[connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
+[connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]
+[connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="restart" flags=3 binds= [ 2.0 ]]
 
-[editable path="Camera2D/HUD"]
+[editable path="HUD"]

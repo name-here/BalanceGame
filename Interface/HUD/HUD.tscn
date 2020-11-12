@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Interface/HUD/HUD.gd" type="Script" id=1]
 [ext_resource path="res://Interface/SplitBar/SplitBar.tscn" type="PackedScene" id=2]
@@ -9,124 +9,98 @@ border_width_left = 3
 border_width_top = 3
 border_width_bottom = 3
 border_color = Color( 0, 0, 0, 1 )
+corner_detail = 1
 
 [sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 1, 1, 1, 1 )
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color( 0, 0, 0, 1 )
-
-[sub_resource type="Theme" id=3]
-ProgressBar/styles/bg = SubResource( 1 )
-ProgressBar/styles/fg = SubResource( 2 )
-
-[sub_resource type="StyleBoxFlat" id=4]
-bg_color = Color( 1, 1, 1, 1 )
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color( 0, 0, 0, 1 )
-
-[sub_resource type="StyleBoxFlat" id=5]
 bg_color = Color( 0.223529, 0.592157, 0.341176, 1 )
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color( 0, 0, 0, 1 )
+corner_detail = 1
 
-[sub_resource type="Theme" id=6]
-ProgressBar/styles/bg = SubResource( 4 )
-ProgressBar/styles/fg = SubResource( 5 )
-
-[sub_resource type="StyleBoxFlat" id=7]
+[sub_resource type="StyleBoxFlat" id=3]
 bg_color = Color( 0.972549, 0.854902, 0, 1 )
 border_width_left = 3
 border_width_top = 3
 border_width_bottom = 3
 border_color = Color( 0, 0, 0, 1 )
+corner_detail = 1
 
-[sub_resource type="Theme" id=8]
-ProgressBar/styles/bg = SubResource( 7 )
-ProgressBar/styles/fg = SubResource( 2 )
-
-[sub_resource type="StyleBoxFlat" id=9]
+[sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0.972549, 0.854902, 0, 1 )
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color( 0, 0, 0, 1 )
+corner_detail = 1
 
-[sub_resource type="Theme" id=10]
-ProgressBar/styles/bg = SubResource( 4 )
-ProgressBar/styles/fg = SubResource( 9 )
-
-[node name="HUD" type="Control"]
-margin_left = -512.0
-margin_top = -512.0
-margin_right = 512.0
-margin_bottom = 512.0
+[node name="HUD" type="CanvasLayer"]
 script = ExtResource( 1 )
+_frame = NodePath("Frame")
+
+[node name="Frame" type="Control" parent="."]
+margin_right = 1024.0
+margin_bottom = 1024.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="Frame"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-custom_constants/margin_right = 20
-custom_constants/margin_top = 20
-custom_constants/margin_left = 20
-custom_constants/margin_bottom = 20
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/margin_right = 32
+custom_constants/margin_top = 32
+custom_constants/margin_left = 32
+custom_constants/margin_bottom = 32
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Inset" type="Control" parent="Margin"]
-margin_left = 20.0
-margin_top = 20.0
-margin_right = 1004.0
-margin_bottom = 1004.0
+[node name="Inset" type="Control" parent="Frame/Margin"]
+margin_left = 32.0
+margin_top = 32.0
+margin_right = 992.0
+margin_bottom = 992.0
 
-[node name="Torque" parent="Margin/Inset" instance=ExtResource( 2 )]
-anchor_left = 0.5
+[node name="Torque" parent="Frame/Margin/Inset" instance=ExtResource( 2 )]
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -250.0
-margin_top = -50.0
-margin_right = 250.0
+margin_left = 32.0
+margin_top = -64.0
+margin_right = -32.0
 margin_bottom = 0.0
 _left_bar = NodePath("../Torque/Left/Left")
 _right_bar = NodePath("../Torque/Right/Right")
 
-[node name="Left" parent="Margin/Inset/Torque" index="0"]
-margin_right = 248.0
-margin_bottom = 50.0
+[node name="Left" parent="Frame/Margin/Inset/Torque" index="0"]
+margin_right = 446.0
+margin_bottom = 64.0
 
-[node name="Left" parent="Margin/Inset/Torque/Left" index="0"]
-margin_right = 248.0
-margin_bottom = 47.0
-theme = SubResource( 3 )
+[node name="Left" parent="Frame/Margin/Inset/Torque/Left" index="0"]
+margin_right = 446.0
+margin_bottom = 61.0
+custom_styles/bg = SubResource( 1 )
 
-[node name="Separator" parent="Margin/Inset/Torque" index="1"]
-margin_left = 248.0
-margin_right = 252.0
-margin_bottom = 50.0
+[node name="Separator" parent="Frame/Margin/Inset/Torque" index="1"]
+margin_left = 446.0
+margin_right = 450.0
+margin_bottom = 64.0
 
-[node name="Right" parent="Margin/Inset/Torque" index="2"]
-margin_left = 252.0
-margin_right = 500.0
-margin_bottom = 50.0
+[node name="Right" parent="Frame/Margin/Inset/Torque" index="2"]
+margin_left = 450.0
+margin_right = 896.0
+margin_bottom = 64.0
 
-[node name="Right" parent="Margin/Inset/Torque/Right" index="0"]
-margin_right = 248.0
-margin_bottom = 47.0
-theme = SubResource( 6 )
+[node name="Right" parent="Frame/Margin/Inset/Torque/Right" index="0"]
+margin_right = 446.0
+margin_bottom = 61.0
+custom_styles/fg = SubResource( 2 )
 
-[node name="Tension" parent="Margin/Inset" instance=ExtResource( 2 )]
+[node name="Tension" parent="Frame/Margin/Inset" instance=ExtResource( 2 )]
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -139,32 +113,32 @@ rect_rotation = -90.0
 _left_bar = NodePath("../Tension/Left/Left")
 _right_bar = NodePath("../Tension/Right/Right")
 
-[node name="Left" parent="Margin/Inset/Tension" index="0"]
+[node name="Left" parent="Frame/Margin/Inset/Tension" index="0"]
 margin_right = 248.0
 margin_bottom = 50.0
 
-[node name="Left" parent="Margin/Inset/Tension/Left" index="0"]
+[node name="Left" parent="Frame/Margin/Inset/Tension/Left" index="0"]
 margin_right = 248.0
 margin_bottom = 47.0
-theme = SubResource( 8 )
+custom_styles/bg = SubResource( 3 )
 
-[node name="Separator" parent="Margin/Inset/Tension" index="1"]
+[node name="Separator" parent="Frame/Margin/Inset/Tension" index="1"]
 margin_left = 248.0
 margin_right = 252.0
 margin_bottom = 50.0
 
-[node name="Right" parent="Margin/Inset/Tension" index="2"]
+[node name="Right" parent="Frame/Margin/Inset/Tension" index="2"]
 margin_left = 252.0
 margin_right = 500.0
 margin_bottom = 50.0
 
-[node name="Right" parent="Margin/Inset/Tension/Right" index="0"]
+[node name="Right" parent="Frame/Margin/Inset/Tension/Right" index="0"]
 margin_right = 248.0
 margin_bottom = 47.0
-theme = SubResource( 10 )
-[connection signal="tension_changed" from="." to="Margin/Inset/Tension" method="_set_value"]
-[connection signal="torque_changed" from="." to="Margin/Inset/Torque" method="_set_value"]
+custom_styles/fg = SubResource( 4 )
+[connection signal="tension_changed" from="." to="Frame/Margin/Inset/Tension" method="_set_value"]
+[connection signal="torque_changed" from="." to="Frame/Margin/Inset/Torque" method="_set_value"]
 
-[editable path="Margin/Inset/Torque"]
+[editable path="Frame/Margin/Inset/Torque"]
 
-[editable path="Margin/Inset/Tension"]
+[editable path="Frame/Margin/Inset/Tension"]

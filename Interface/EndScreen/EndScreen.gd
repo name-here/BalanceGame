@@ -1,9 +1,9 @@
-extends MarginContainer
+extends Control
 
 class_name EndScreen
 
 
-signal replay_pressed
+signal restart_pressed
 signal continue_pressed
 
 export(bool) var active := false setget set_active
@@ -14,6 +14,9 @@ var text_fields:Array
 
 export(Array, NodePath) var _buttons:Array
 var buttons:Array
+
+export(NodePath) var _background:NodePath
+onready var background:ColorRect = get_node(_background)
 
 func _ready() -> void:
 	for i in _text_fields.size():
@@ -43,6 +46,8 @@ func set_alpha(new_alpha:float) -> void:
 			var target_color:Color = button.get_color(color_field, "Button")
 			target_color.a = alpha
 			button.add_color_override(color_field, target_color)
+	if background:
+		background.color.a = new_alpha / 4
 	alpha = new_alpha
 
 func set_active(value) -> void:
@@ -51,8 +56,8 @@ func set_active(value) -> void:
 	active = value
 
 
-func _replay_pressed():
-	emit_signal("replay_pressed")
+func _restart_pressed():
+	emit_signal("restart_pressed")
 
 func _continue_pressed():
 	emit_signal("continue_pressed")

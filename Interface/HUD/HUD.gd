@@ -1,7 +1,11 @@
-extends Control
+extends CanvasLayer
+
 
 signal torque_changed(value)
 signal tension_changed(value)
+
+export(NodePath) var _frame:NodePath
+onready var frame:Control = get_node(_frame)
 
 
 func _ready():
@@ -9,8 +13,7 @@ func _ready():
 	get_viewport().connect("size_changed", self, "update_size")
 
 func update_size():
-	rect_size = get_viewport_rect().size
-	rect_position = -get_viewport_rect().size / 2
+	frame.rect_size = frame.get_viewport_rect().size
 
 func _set_torque(value):
 	emit_signal("torque_changed", value)

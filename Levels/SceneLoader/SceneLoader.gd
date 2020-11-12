@@ -1,11 +1,10 @@
 extends Node
 
-class_name SceneLoader
-
 
 signal progress_changed(percent)
 signal scene_loaded
 
+export(String) var scenes_folder:String
 export(Array, String) var scenes:Array
 export(int) var starting_scene:int = 0#scene loaded on ready, set to -1 to not load anything
 var load_index:int#index of the scene to be loaded
@@ -16,11 +15,13 @@ var progress:float
 
 
 func _ready():
+	if not scenes_folder.ends_with("/"):
+		scenes_folder += "/"
 	load_scene(starting_scene)
 
 func load_scene(index:int):
 	if index >= 0 and index < scenes.size():
-		var packed_scene:PackedScene = ResourceLoader.load(scenes[starting_scene])
+		var packed_scene:PackedScene = ResourceLoader.load(scenes_folder+"/"+scenes[index]+"/"+scenes[index]+".tscn")
 		if packed_scene != null:
 			loading_scene = packed_scene.instance()
 			switch_scene()

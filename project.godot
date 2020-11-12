@@ -9,7 +9,12 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "MarginContainer",
+"base": "Node2D",
+"class": "Character",
+"language": "GDScript",
+"path": "res://Character/Character.gd"
+}, {
+"base": "Control",
 "class": "EndScreen",
 "language": "GDScript",
 "path": "res://Interface/EndScreen/EndScreen.gd"
@@ -19,15 +24,16 @@ _global_script_classes=[ {
 "language": "NativeScript",
 "path": "res://git_api.gdns"
 }, {
-"base": "Node",
-"class": "SceneLoader",
+"base": "Node2D",
+"class": "LevelController",
 "language": "GDScript",
-"path": "res://Levels/SceneLoader/SceneLoader.gd"
+"path": "res://Levels/LevelController/LevelController.gd"
 } ]
 _global_script_class_icons={
+"Character": "",
 "EndScreen": "",
 "GitAPI": "",
-"SceneLoader": ""
+"LevelController": ""
 }
 
 [application]
@@ -99,4 +105,4 @@ quality/driver/driver_name="GLES2"
 quality/intended_usage/framebuffer_allocation=0
 quality/intended_usage/framebuffer_allocation.mobile=0
 vram_compression/import_etc=true
-environment/default_clear_color=Color( 0.196078, 0.196078, 0.196078, 1 )
+environment/default_clear_color=Color( 0.192157, 0.192157, 0.192157, 1 )
