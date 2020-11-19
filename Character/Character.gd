@@ -1,6 +1,4 @@
-extends Node2D
-
-class_name Character
+class_name Character extends Node2D
 
 
 signal character_torque_changed(value)

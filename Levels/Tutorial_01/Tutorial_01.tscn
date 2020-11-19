@@ -19,6 +19,7 @@ _camera = NodePath("Camera2D")
 _goal = NodePath("Geometry/Goal")
 _floor_ = NodePath("Geometry/Floor")
 _wall = NodePath("Geometry/Wall")
+_next_wall = NodePath("Geometry/NextWall")
 _character_label = NodePath("Character/Label")
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
@@ -27,21 +28,27 @@ color = Color( 0.192157, 0.192157, 0.192157, 1 )
 [node name="LevelController" parent="." instance=ExtResource( 4 )]
 _character = NodePath("../Character")
 _camera = NodePath("../Camera2D")
+end_position = Vector2( 886, -96 )
 _end_screen = NodePath("../HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
 
 [node name="Geometry" type="Node2D" parent="."]
 
 [node name="Floor" parent="Geometry" instance=ExtResource( 9 )]
-position = Vector2( 512, 0 )
-scale = Vector2( 1024, 256 )
+position = Vector2( 1024, 0 )
+scale = Vector2( 2048, 256 )
 
 [node name="Wall" parent="Geometry" instance=ExtResource( 10 )]
 position = Vector2( 8, -384 )
 scale = Vector2( 16, 768 )
 
+[node name="NextWall" parent="Geometry" instance=ExtResource( 10 )]
+position = Vector2( 384, 384 )
+scale = Vector2( 64, 768 )
+
 [node name="Goal" parent="Geometry" instance=ExtResource( 8 )]
-position = Vector2( 864, 0 )
+position = Vector2( 864, -32 )
+color = Color( 0.564706, 0.807843, 0.643137, 1 )
 _character = NodePath("../../Character")
 
 [node name="Character" parent="." instance=ExtResource( 1 )]
@@ -72,7 +79,7 @@ __meta__ = {
 
 [node name="HUD" parent="." instance=ExtResource( 2 )]
 
-[node name="Tension" parent="HUD/Frame/Margin/Inset" index="1"]
+[node name="Right" parent="HUD/Frame/Margin" index="1"]
 visible = false
 
 [node name="RewindOverlay" type="ColorRect" parent="HUD/Frame" index="1"]
@@ -86,12 +93,13 @@ __meta__ = {
 [node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
 visible = false
 alpha = 0.0
-[connection signal="on_restart" from="LevelController" to="." method="_on_restart"]
+[connection signal="on_restart" from="LevelController" to="." method="_on_level_restart"]
 [connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
 [connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
+[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="go_to_next_level"]
 [connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="restart" flags=3 binds= [ 2.0 ]]
 
 [editable path="HUD"]

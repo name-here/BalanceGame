@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Levels/Tutorial_02/Tutorial_02.gd" type="Script" id=1]
 [ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=2]
@@ -9,6 +9,15 @@
 [ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Levels/LevelController/LevelController.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Levels/Tutorial_02/Arrow.png" type="Texture" id=9]
+[ext_resource path="res://Interface/RewindOverlay/RewindOverlay.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=12]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 12 )
+shader_param/isActive = false
+shader_param/fadeOpacity = 1.0
+shader_param/color = Color( 0.498039, 0.498039, 0.498039, 1 )
 
 [node name="Tutorial_02" type="Node2D"]
 script = ExtResource( 1 )
@@ -17,11 +26,15 @@ _goal = NodePath("Geometry/Goal")
 _left_wall = NodePath("Geometry/LeftWall")
 _floor_ = NodePath("Geometry/Floor")
 
+[node name="BackgroundColor" parent="." instance=ExtResource( 11 )]
+color = Color( 0.137255, 0.462745, 0.682353, 1 )
+
 [node name="LevelController" parent="." instance=ExtResource( 8 )]
 _character = NodePath("../Character")
 _camera = NodePath("../Character/Camera2D")
-_end_screen = NodePath("../HUD/EndScreen")
-_rewind_overlay = NodePath("../HUD/RewindOverlay")
+end_position = Vector2( 2048, -64 )
+_end_screen = NodePath("../HUD/Frame/EndScreen")
+_rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
 
 [node name="Geometry" type="Node2D" parent="."]
 
@@ -34,10 +47,13 @@ position = Vector2( 1024, 0 )
 scale = Vector2( 3072, 256 )
 
 [node name="Start" parent="Geometry" instance=ExtResource( 2 )]
-script = null
+material = SubResource( 1 )
+is_active = false
+color = Color( 0.498039, 0.498039, 0.498039, 1 )
 
 [node name="Goal" parent="Geometry" instance=ExtResource( 2 )]
-position = Vector2( 2048, 0 )
+position = Vector2( 2048, -32 )
+color = Color( 0.564706, 0.807843, 0.643137, 1 )
 _character = NodePath("../../Character")
 
 [node name="Arrows" type="Node2D" parent="Geometry"]
@@ -65,32 +81,22 @@ position = Vector2( 0, -160 )
 
 [node name="Camera2D" type="Camera2D" parent="Character"]
 position = Vector2( 0, -96 )
+process_mode = 0
 
 [node name="HUD" parent="." instance=ExtResource( 4 )]
 
-[node name="RewindOverlay" type="ColorRect" parent="HUD"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color( 0.635294, 0.827451, 0.87451, 0 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 10 )]
+visible = false
 
-[node name="EndScreen" parent="HUD" instance=ExtResource( 7 )]
+[node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
 visible = false
 alpha = 0.0
-
-[node name="Background" parent="HUD/EndScreen" index="0"]
-margin_bottom = 1024.0
-
-[node name="VBoxContainer" parent="HUD/EndScreen/MarginContainer" index="0"]
-margin_bottom = 1024.0
 [connection signal="on_restart" from="LevelController" to="." method="_on_level_on_restart"]
 [connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
 [connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
-[connection signal="restart_pressed" from="HUD/EndScreen" to="LevelController" method="restart" flags=3 binds= [ 2.0 ]]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="restart" flags=3 binds= [ 2.0 ]]
 
-[editable path="HUD/EndScreen"]
+[editable path="HUD"]

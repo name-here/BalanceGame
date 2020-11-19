@@ -1,6 +1,4 @@
-extends Control
-
-class_name EndScreen
+class_name EndScreen extends Control
 
 
 signal restart_pressed

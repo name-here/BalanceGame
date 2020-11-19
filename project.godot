@@ -28,18 +28,24 @@ _global_script_classes=[ {
 "class": "LevelController",
 "language": "GDScript",
 "path": "res://Levels/LevelController/LevelController.gd"
+}, {
+"base": "Node",
+"class": "SceneLoader",
+"language": "GDScript",
+"path": "res://Levels/SceneLoader/SceneLoader.gd"
 } ]
 _global_script_class_icons={
 "Character": "",
 "EndScreen": "",
 "GitAPI": "",
-"LevelController": ""
+"LevelController": "",
+"SceneLoader": ""
 }
 
 [application]
 
 config/name="Balance Game"
-run/main_scene="res://Levels/Tutorial_01/Tutorial_01.tscn"
+run/main_scene="res://Levels/SceneLoader/SceneLoader.tscn"
 config/icon="res://icon.png"
 
 [autoload]
@@ -105,4 +111,5 @@ quality/driver/driver_name="GLES2"
 quality/intended_usage/framebuffer_allocation=0
 quality/intended_usage/framebuffer_allocation.mobile=0
 vram_compression/import_etc=true
-environment/default_clear_color=Color( 0.192157, 0.192157, 0.192157, 1 )
+environment/default_clear_color=Color( 0.137255, 0.462745, 0.682353, 1 )
+quality/filters/msaa=2
