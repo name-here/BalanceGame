@@ -42,7 +42,7 @@ func set_active(value := true) -> void:
 func start_next_level():
 	if next_level_ready:
 		level_controller.tween.remove_all()
-		#Physics2DServer.set_active(true)
+		Physics2DServer.set_active(true)
 		scene_loader.call_deferred("switch_scene")
 	else:
 		switch_when_ready = true

@@ -23,6 +23,7 @@ func set_active(value := true) -> void:
 	level_controller.set_active(value)
 	_on_window_resize()
 	get_viewport().connect("size_changed", self, "_on_window_resize")
+	#level_controller.restart(0.5, true)
 
 
 func _on_level_state_changed(new_state:int, last_state:int):

@@ -230,7 +230,7 @@ func go_to_next_level():
 	tween.interpolate_method(self, "set_character_state",
 		Color( character.wheel.global_position.x, character.wheel.global_position.y,
 			character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
-		Color(end_position.x, -32, 0, 128),
+		Color(end_position.x, -48, 0, 144),
 		next_level_anim_time, Tween.TRANS_CUBIC)
 	tween.interpolate_property(character.wheel, "rotation",
 		character.wheel.rotation, 0, next_level_anim_time,  Tween.TRANS_CUBIC)

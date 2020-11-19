@@ -7,7 +7,7 @@
 [ext_resource path="res://Character/Connector.png" type="Texture" id=5]
 
 [sub_resource type="CircleShape2D" id=1]
-radius = 32.0
+radius = 48.0
 
 [sub_resource type="CapsuleShape2D" id=2]
 radius = 32.0
@@ -22,7 +22,7 @@ _spring = NodePath("Body/AttachPoint/DampedSpringJoint2D")
 _connector = NodePath("Body/Connector")
 
 [node name="Wheel" type="RigidBody2D" parent="."]
-position = Vector2( 0, 128 )
+position = Vector2( 0, 144 )
 collision_layer = 2
 collision_mask = 12
 angular_damp = 0.0
@@ -34,7 +34,7 @@ __meta__ = {
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="Wheel"]
-scale = Vector2( 0.25, 0.25 )
+scale = Vector2( 0.5, 0.5 )
 texture = ExtResource( 1 )
 
 [node name="Body" type="RigidBody2D" parent="."]
@@ -52,13 +52,13 @@ __meta__ = {
 shape = SubResource( 2 )
 
 [node name="Connector" type="Node2D" parent="Body"]
-position = Vector2( 0, 128 )
+position = Vector2( 0, 144 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="Sprite2" type="Sprite" parent="Body/Connector"]
-position = Vector2( 0, -56 )
+position = Vector2( 0, -68 )
 scale = Vector2( 4, 4 )
 texture = ExtResource( 5 )
 
@@ -67,7 +67,7 @@ scale = Vector2( 4, 4 )
 texture = ExtResource( 2 )
 
 [node name="AttachPoint" type="Node2D" parent="Body"]
-position = Vector2( 0, 96 )
+position = Vector2( 0, 112 )
 
 [node name="GrooveJoint2D" type="GrooveJoint2D" parent="Body/AttachPoint"]
 node_a = NodePath("../..")

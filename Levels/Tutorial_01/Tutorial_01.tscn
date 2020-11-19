@@ -23,7 +23,7 @@ _next_wall = NodePath("Geometry/NextWall")
 _character_label = NodePath("Character/Label")
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
-color = Color( 0.192157, 0.192157, 0.192157, 1 )
+color = Color( 0.176471, 0.176471, 0.176471, 1 )
 
 [node name="LevelController" parent="." instance=ExtResource( 4 )]
 _character = NodePath("../Character")
@@ -52,7 +52,7 @@ color = Color( 0.564706, 0.807843, 0.643137, 1 )
 _character = NodePath("../../Character")
 
 [node name="Character" parent="." instance=ExtResource( 1 )]
-position = Vector2( 160, -160 )
+position = Vector2( 160, -192 )
 do_compress_input = false
 
 [node name="Label" type="Label" parent="Character"]

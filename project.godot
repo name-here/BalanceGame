@@ -52,6 +52,10 @@ config/icon="res://icon.png"
 
 AsyncLoader="*res://AutoLoad/AsyncLoader.gd"
 
+[debug]
+
+gdscript/warnings/return_value_discarded=false
+
 [display]
 
 window/size/height=1024
@@ -111,5 +115,5 @@ quality/driver/driver_name="GLES2"
 quality/intended_usage/framebuffer_allocation=0
 quality/intended_usage/framebuffer_allocation.mobile=0
 vram_compression/import_etc=true
-environment/default_clear_color=Color( 0.137255, 0.462745, 0.682353, 1 )
+environment/default_clear_color=Color( 0.109804, 0.313726, 0.552941, 1 )
 quality/filters/msaa=2

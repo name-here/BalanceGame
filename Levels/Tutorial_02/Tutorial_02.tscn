@@ -27,7 +27,7 @@ _left_wall = NodePath("Geometry/LeftWall")
 _floor_ = NodePath("Geometry/Floor")
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 11 )]
-color = Color( 0.137255, 0.462745, 0.682353, 1 )
+color = Color( 0.109804, 0.313726, 0.552941, 1 )
 
 [node name="LevelController" parent="." instance=ExtResource( 8 )]
 _character = NodePath("../Character")
@@ -77,10 +77,10 @@ texture = ExtResource( 9 )
 offset = Vector2( 0, 8 )
 
 [node name="Character" parent="." instance=ExtResource( 6 )]
-position = Vector2( 0, -160 )
+position = Vector2( 0, -192 )
 
 [node name="Camera2D" type="Camera2D" parent="Character"]
-position = Vector2( 0, -96 )
+position = Vector2( 0, -64 )
 process_mode = 0
 
 [node name="HUD" parent="." instance=ExtResource( 4 )]
