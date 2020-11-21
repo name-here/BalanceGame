@@ -51,8 +51,7 @@ scale = Vector2( 3072, 256 )
 
 [node name="Start" parent="Geometry" instance=ExtResource( 2 )]
 material = SubResource( 1 )
-is_active = false
-color = Color( 0.498039, 0.498039, 0.498039, 1 )
+script = null
 
 [node name="Goal" parent="Geometry" instance=ExtResource( 2 )]
 position = Vector2( 2048, -32 )

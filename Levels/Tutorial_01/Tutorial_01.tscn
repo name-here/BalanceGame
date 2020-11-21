@@ -19,7 +19,7 @@ _camera = NodePath("Camera2D")
 _goal = NodePath("Geometry/Goal")
 _floor_ = NodePath("Geometry/Floor")
 _wall = NodePath("Geometry/Wall")
-_character_label = NodePath("Character/Label")
+_level_text = [ NodePath("Character/Label"), NodePath("Geometry/Label") ]
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
 color = Color( 0.129412, 0.129412, 0.129412, 1 )
@@ -46,8 +46,22 @@ position = Vector2( 864, -32 )
 color = Color( 0.564706, 0.807843, 0.643137, 1 )
 _character = NodePath("../../Character")
 
+[node name="Label" type="Label" parent="Geometry"]
+margin_left = 864.0
+margin_top = 64.0
+margin_right = 864.0
+margin_bottom = 64.0
+grow_horizontal = 2
+theme = ExtResource( 3 )
+custom_colors/font_color = Color( 0.129412, 0.129412, 0.129412, 1 )
+text = "get here."
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="Character" parent="." instance=ExtResource( 1 )]
-position = Vector2( 160, -192 )
+position = Vector2( 172, -192 )
 do_compress_input = false
 
 [node name="Label" type="Label" parent="Character"]
@@ -59,8 +73,8 @@ grow_horizontal = 2
 grow_vertical = 0
 theme = ExtResource( 3 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
-text = "get to
-the goal."
+text = "stay
+balanced."
 align = 1
 __meta__ = {
 "_edit_use_anchors_": false
