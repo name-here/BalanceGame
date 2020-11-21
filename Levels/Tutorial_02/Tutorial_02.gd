@@ -11,19 +11,41 @@ onready var left_wall:StaticBody2D = get_node(_left_wall)
 export(NodePath) var _floor_:NodePath
 onready var floor_:StaticBody2D = get_node(_floor_)
 
+export(Array, NodePath) var _arrows:Array
+var arrows:Array
+export(NodePath) var _tension_bar:NodePath
+onready var tension_bar:Control = get_node(_tension_bar)
+
 export(float) var intro_anim_time:float = 2
 
 
 func _ready():
-	set_active()
+	for _arrow in _arrows:
+		var arrow = get_node(_arrow)
+		assert(arrow is Sprite)
+		arrows.append(arrow)
 
 
 func set_active(value := true) -> void:
 	level_controller.end_position.x = goal.global_position.x
 	level_controller.set_active(value)
 	_on_window_resize()
+	level_controller.pause()
+	
+	for arrow in arrows:
+		arrow.modulate.a = 0
+		level_controller.tween.interpolate_property(arrow, "modulate:a",
+			0, 1, intro_anim_time)
+	left_wall.global_position.x -= 64
+	level_controller.tween.interpolate_property(left_wall, "global_position:x",
+		left_wall.global_position.x, left_wall.global_position.x + 64,
+		intro_anim_time, Tween.TRANS_CUBIC, Tween.EASE_OUT)
+	level_controller.tween.interpolate_deferred_callback(self, intro_anim_time, "_on_intro_anim_done")
+	level_controller.tween.start()
+
+func _on_intro_anim_done() -> void:
 	get_viewport().connect("size_changed", self, "_on_window_resize")
-	#level_controller.restart(0.5, true)
+	level_controller.play()
 
 
 func _on_level_state_changed(new_state:int, last_state:int):

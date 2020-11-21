@@ -241,8 +241,8 @@ func go_to_next_level():
 
 
 func set_state(new_state:int):
-	state = new_state
 	call_deferred("emit_signal", "state_changed", new_state, state)
+	state = new_state
 
 func set_physics(value:bool):
 	Physics2DServer.set_active(value)

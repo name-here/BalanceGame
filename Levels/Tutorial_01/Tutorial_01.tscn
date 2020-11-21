@@ -19,11 +19,10 @@ _camera = NodePath("Camera2D")
 _goal = NodePath("Geometry/Goal")
 _floor_ = NodePath("Geometry/Floor")
 _wall = NodePath("Geometry/Wall")
-_next_wall = NodePath("Geometry/NextWall")
 _character_label = NodePath("Character/Label")
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
-color = Color( 0.176471, 0.176471, 0.176471, 1 )
+color = Color( 0.129412, 0.129412, 0.129412, 1 )
 
 [node name="LevelController" parent="." instance=ExtResource( 4 )]
 _character = NodePath("../Character")
@@ -41,10 +40,6 @@ scale = Vector2( 2048, 256 )
 [node name="Wall" parent="Geometry" instance=ExtResource( 10 )]
 position = Vector2( 8, -384 )
 scale = Vector2( 16, 768 )
-
-[node name="NextWall" parent="Geometry" instance=ExtResource( 10 )]
-position = Vector2( 384, 384 )
-scale = Vector2( 64, 768 )
 
 [node name="Goal" parent="Geometry" instance=ExtResource( 8 )]
 position = Vector2( 864, -32 )

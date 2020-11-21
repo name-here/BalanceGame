@@ -14,11 +14,11 @@ func _ready():
 		color_rect = get_node(_color_rect)
 		update_size()
 		viewport.connect("size_changed", self, "update_size")
-	print("run from ready with ", color)
+	#print("run from ready with ", color)
 	_set_color(color)
 
 func _set_color(new_color:Color):
-	print("setting ", color)
+	#print("setting ", color)
 	if Engine.editor_hint:
 		get_node(_color_rect).color = new_color
 		ProjectSettings.set_setting("rendering/environment/default_clear_color", new_color)

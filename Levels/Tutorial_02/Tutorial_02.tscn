@@ -25,14 +25,17 @@ _level_controller = NodePath("LevelController")
 _goal = NodePath("Geometry/Goal")
 _left_wall = NodePath("Geometry/LeftWall")
 _floor_ = NodePath("Geometry/Floor")
+_arrows = [ NodePath("Geometry/Arrows/Arrow1"), NodePath("Geometry/Arrows/Arrow2"), NodePath("Geometry/Arrows/Arrow3") ]
+_tension_bar = NodePath("HUD/Frame/Margin/Right/Control/Tension")
+intro_anim_time = 1.0
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 11 )]
-color = Color( 0.109804, 0.313726, 0.552941, 1 )
+color = Color( 0.168627, 0.388235, 0.741176, 1 )
 
 [node name="LevelController" parent="." instance=ExtResource( 8 )]
 _character = NodePath("../Character")
 _camera = NodePath("../Character/Camera2D")
-end_position = Vector2( 2048, -64 )
+end_position = Vector2( 2048, -96 )
 _end_screen = NodePath("../HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
 
@@ -84,6 +87,9 @@ position = Vector2( 0, -64 )
 process_mode = 0
 
 [node name="HUD" parent="." instance=ExtResource( 4 )]
+
+[node name="Right" parent="HUD/Frame/Margin" index="1"]
+visible = false
 
 [node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 10 )]
 visible = false
