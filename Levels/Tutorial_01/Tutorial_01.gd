@@ -23,19 +23,11 @@ export(NodePath) var _wall:NodePath
 onready var wall:StaticBody2D = get_node(_wall)
 export(float) var wall_width:float
 
-export(Array, NodePath) var _level_text:Array
-var level_text:Array
-
 
 func _ready():
 	has_scene_loader = get_parent() is SceneLoader
 	if has_scene_loader:
 		scene_loader = get_parent()
-	
-	for _element in _level_text:
-		var element = get_node(_element)
-		assert(element is CanvasItem)
-		level_text.append(element)
 
 
 func set_active(value := true) -> void:
@@ -55,8 +47,6 @@ func start_next_level():
 func _on_level_state_changed(new_state:int, last_state:int):
 	match new_state:
 		level_controller.states.COMPLETE_1:
-			level_controller.tween.interpolate_method(self, "set_text_alpha",
-				1, 0, level_controller.completion_anim_times[0])
 			level_controller.tween.interpolate_property(camera, "global_position:x",
 				camera.global_position.x, goal.global_position.x, level_controller.completion_anim_times[0], Tween.TRANS_CUBIC)
 		
@@ -75,13 +65,6 @@ func _on_level_state_changed(new_state:int, last_state:int):
 						level_controller.next_level_anim_time, Tween.TRANS_CUBIC, Tween.EASE_IN)
 				level_controller.tween.interpolate_deferred_callback(self, level_controller.next_level_anim_time, "start_next_level")
 				level_controller.tween.start()
-		
-		_:
-			if new_state < level_controller.states.COMPLETE_1 and last_state >= level_controller.states.COMPLETE_1:
-				level_controller.tween.interpolate_method(self, "set_text_alpha",
-					0, 1, level_controller.completion_anim_times[0])
-			else:
-				print(new_state, ", ", last_state)
 
 func _on_next_level_loaded():
 	next_level_ready = true
@@ -91,11 +74,6 @@ func _on_next_level_loaded():
 func _on_level_restart(time:float):
 	level_controller.tween.interpolate_property(camera, "global_position:x",
 		camera.global_position.x, 512, time/2, Tween.TRANS_CUBIC)
-
-
-func set_text_alpha(alpha:float):
-	for element in level_text:
-		element.modulate.a = alpha
 
 
 func _on_window_resize():#TODO: Change some of this to not use global properties!<<<<<<<<<<<<<<<<<<<<<<<<<

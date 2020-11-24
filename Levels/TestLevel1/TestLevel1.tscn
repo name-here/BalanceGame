@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Character/Character.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/TestLevel1/TestTexture.png" type="Texture" id=2]
 [ext_resource path="res://Levels/TestLevel1/LevelController.gd" type="Script" id=3]
 [ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Levels/LevelController/LevelController.gd" type="Script" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 512, 512 )
@@ -13,11 +14,18 @@ script = ExtResource( 3 )
 _character = NodePath("Character")
 _camera = NodePath("Character/Camera2D")
 
+[node name="LevelController" type="Node2D" parent="."]
+script = ExtResource( 5 )
+_character = NodePath("../Character")
+_camera = NodePath("../Character/Camera2D")
+
 [node name="Geometry" type="Node2D" parent="."]
 
 [node name="Floor" type="StaticBody2D" parent="Geometry"]
 position = Vector2( 848.319, 414.477 )
 scale = Vector2( 3.76, 0.125 )
+collision_layer = 4
+collision_mask = 3
 __meta__ = {
 "_edit_group_": true
 }
@@ -32,6 +40,8 @@ texture = ExtResource( 2 )
 position = Vector2( 719.398, 367.942 )
 rotation = 0.383659
 scale = Vector2( 0.40983, 0.0119219 )
+collision_layer = 4
+collision_mask = 3
 __meta__ = {
 "_edit_group_": true
 }
@@ -46,6 +56,8 @@ texture = ExtResource( 2 )
 position = Vector2( 403.18, 334.732 )
 rotation = -0.228718
 scale = Vector2( 0.268483, -0.0308809 )
+collision_layer = 4
+collision_mask = 3
 __meta__ = {
 "_edit_group_": true
 }
@@ -59,6 +71,8 @@ texture = ExtResource( 2 )
 [node name="Wall 1" type="StaticBody2D" parent="Geometry"]
 position = Vector2( 101.207, 314.407 )
 scale = Vector2( 0.0670489, 0.178948 )
+collision_layer = 8
+collision_mask = 3
 __meta__ = {
 "_edit_group_": true
 }
@@ -72,6 +86,8 @@ texture = ExtResource( 2 )
 [node name="Wall 2" type="StaticBody2D" parent="Geometry"]
 position = Vector2( -1097.15, 142.495 )
 scale = Vector2( 0.0670489, 0.698948 )
+collision_layer = 8
+collision_mask = 3
 __meta__ = {
 "_edit_group_": true
 }
@@ -85,6 +101,8 @@ texture = ExtResource( 2 )
 [node name="Wall 3" type="StaticBody2D" parent="Geometry"]
 position = Vector2( 2798.15, 161.845 )
 scale = Vector2( 0.0670489, 0.698948 )
+collision_layer = 8
+collision_mask = 3
 __meta__ = {
 "_edit_group_": true
 }
@@ -96,9 +114,10 @@ shape = SubResource( 1 )
 texture = ExtResource( 2 )
 
 [node name="Character" parent="." instance=ExtResource( 1 )]
-position = Vector2( 1621.68, 184.619 )
+position = Vector2( 1589.95, 132.495 )
 
 [node name="Camera2D" type="Camera2D" parent="Character"]
+current = true
 drag_margin_left = 1.0
 
 [node name="HUD" parent="Character/Camera2D" instance=ExtResource( 4 )]

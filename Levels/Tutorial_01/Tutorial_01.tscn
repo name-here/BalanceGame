@@ -19,7 +19,6 @@ _camera = NodePath("Camera2D")
 _goal = NodePath("Geometry/Goal")
 _floor_ = NodePath("Geometry/Floor")
 _wall = NodePath("Geometry/Wall")
-_level_text = [ NodePath("Character/Label"), NodePath("Geometry/Label") ]
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
 color = Color( 0.129412, 0.129412, 0.129412, 1 )
@@ -27,6 +26,7 @@ color = Color( 0.129412, 0.129412, 0.129412, 1 )
 [node name="LevelController" parent="." instance=ExtResource( 4 )]
 _character = NodePath("../Character")
 _camera = NodePath("../Camera2D")
+_fade_out = [ NodePath("../Character/Label"), NodePath("../Geometry/Label") ]
 end_position = Vector2( 886, -96 )
 _end_screen = NodePath("../HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
@@ -109,6 +109,6 @@ alpha = 0.0
 [connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
 [connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="go_to_next_level"]
-[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="restart" flags=3 binds= [ 2.0 ]]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="restart" binds= [ 2.0 ]]
 
 [editable path="HUD"]

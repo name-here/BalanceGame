@@ -115,5 +115,5 @@ quality/driver/driver_name="GLES2"
 quality/intended_usage/framebuffer_allocation=0
 quality/intended_usage/framebuffer_allocation.mobile=0
 vram_compression/import_etc=true
-environment/default_clear_color=Color( 0.168627, 0.388235, 0.741176, 1 )
+environment/default_clear_color=Color( 0.129412, 0.129412, 0.129412, 1 )
 quality/filters/msaa=2

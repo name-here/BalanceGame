@@ -11,8 +11,8 @@ onready var left_wall:StaticBody2D = get_node(_left_wall)
 export(NodePath) var _floor_:NodePath
 onready var floor_:StaticBody2D = get_node(_floor_)
 
-export(Array, NodePath) var _arrows:Array
-var arrows:Array
+export(Array, NodePath) var _fade_in:Array
+var fade_in:Array
 export(NodePath) var _tension_bar:NodePath
 onready var tension_bar:Control = get_node(_tension_bar)
 
@@ -20,10 +20,10 @@ export(float) var intro_anim_time:float = 2
 
 
 func _ready():
-	for _arrow in _arrows:
-		var arrow = get_node(_arrow)
-		assert(arrow is Sprite)
-		arrows.append(arrow)
+	for _element in _fade_in:
+		var element = get_node(_element)
+		assert(element is CanvasItem)
+		fade_in.append(element)
 
 
 func set_active(value := true) -> void:
@@ -32,9 +32,9 @@ func set_active(value := true) -> void:
 	_on_window_resize()
 	level_controller.pause()
 	
-	for arrow in arrows:
-		arrow.modulate.a = 0
-		level_controller.tween.interpolate_property(arrow, "modulate:a",
+	for element in fade_in:
+		element.modulate.a = 0
+		level_controller.tween.interpolate_property(element, "modulate:a",
 			0, 1, intro_anim_time)
 	left_wall.global_position.x -= 64
 	level_controller.tween.interpolate_property(left_wall, "global_position:x",

@@ -22,6 +22,9 @@ onready var character:Character = get_node(_character)
 export(NodePath) var _camera:NodePath
 onready var camera:Camera2D = get_node(_camera)
 
+export(Array, NodePath) var _fade_out:Array
+var fade_out:Array
+
 export(Vector2) var end_position:Vector2
 
 export(NodePath) var _end_screen:NodePath
@@ -39,7 +42,7 @@ export(float) var next_level_anim_time:float = 1.0
 var rewind_time:float = 1#Number of seconds it takes to rewind
 var rewind_time_left:float = 1#Number of seconds left for rewind
 
-const history_max_size:int = 16#Is a power of 2 for simpler code/math
+const history_max_size:int = 8#Is a power of 2 for simpler code/math
 var history_length:int = 0
 var skip_size:int = 1
 var frames_since_last_write = 0
@@ -58,6 +61,11 @@ var frame_num:int = 0
 func _ready():
 	for time in completion_anim_times:
 		assert(time > 0)
+	
+	for _element in _fade_out:
+		var element = get_node(_element)
+		assert(element is CanvasItem)
+		fade_out.append(element)
 	
 	#body_positions_init = body_positions
 	#body_rotations_init = body_rotations
@@ -102,7 +110,8 @@ func _process(delta):
 				else:#This probably doesn't work after skip_size gets near/over history_max_size, but that would take quite a while
 					history_length = history_max_size / 2
 					skip_size *= 2
-				frame_num += 1
+					print(test_data)
+			frame_num += 1
 					
 		
 		states.RESTARTING:
@@ -152,14 +161,17 @@ func next_complete_anim() -> void:
 		set_state(states.COMPLETE_1)
 	elif state < states.size() - 1:
 		set_state(state + 1)
-	
 	#print("asked for stage ", states.keys()[state])
 	
 	match state:
 		states.COMPLETE_1:
-			tween.interpolate_property(Engine, "time_scale", Engine.time_scale, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
+			tween.interpolate_property(Engine, "time_scale",
+				Engine.time_scale, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
 			#tween.interpolate_callback(self, completion_anim_times[0], "reset_timescales")
 			#tween.interpolate_callback(self, completion_anim_times[0], "set_physics", false)
+			
+			tween.interpolate_method(self, "set_fade_out_alpha",
+				1, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
 			tween.interpolate_callback(self, completion_anim_times[0], "next_complete_anim")
 			tween.ignore_engine_timescale = true
 			tween.start()
@@ -176,7 +188,7 @@ func next_complete_anim() -> void:
 					0, character.body.global_position.distance_to(character.wheel.global_position) ),
 				completion_anim_times[1], Tween.TRANS_CUBIC)
 			tween.interpolate_method(end_screen, "set_alpha",
-				0, 1, completion_anim_times[1])
+				0, 1, completion_anim_times[1], Tween.TRANS_CUBIC)
 			tween.interpolate_callback(self, completion_anim_times[1], "next_complete_anim")
 			tween.start()
 		states.COMPLETE_3:
@@ -215,6 +227,8 @@ func restart(time:float = 1, override:bool = false):
 				end_screen.active = false
 				tween.interpolate_method(end_screen, "set_alpha",
 					1, 0, time/2, Tween.TRANS_EXPO, Tween.EASE_OUT)
+				tween.interpolate_method(self, "set_fade_out_alpha",
+					0, 1, time/2, Tween.TRANS_QUAD, Tween.EASE_OUT)
 				tween.interpolate_method(self, "set_character_state",
 					Color( character.global_position.x, character.global_position.y,
 						character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
@@ -235,7 +249,7 @@ func go_to_next_level():
 	tween.interpolate_property(character.wheel, "rotation",
 		character.wheel.rotation, 0, next_level_anim_time,  Tween.TRANS_CUBIC)
 	tween.interpolate_method(end_screen, "set_alpha",
-		1, 0, next_level_anim_time)
+		1, 0, next_level_anim_time, Tween.TRANS_EXPO, Tween.EASE_OUT)
 	#tween.interpolate_deferred_callback(self, next_level_anim_time, "emit_signal", "start_next_level")
 	tween.start()
 
@@ -265,6 +279,10 @@ func set_character_state(new_state:Color):#sets position, rotation, and distance
 	character.body.global_rotation = new_state[2]
 	character.connector.global_position = character.wheel.global_position
 	character.connector.global_rotation = character.body.global_rotation
+
+func set_fade_out_alpha(alpha:float):
+	for element in fade_out:
+		element.modulate.a = alpha
 
 #func reset_timescales():
 #	tween.ignore_engine_timescale = false
