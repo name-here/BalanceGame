@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Levels/Tutorial_02/Tutorial_02.gd" type="Script" id=1]
 [ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=2]
@@ -13,6 +13,7 @@
 [ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=12]
 [ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=13]
+[ext_resource path="res://Materials/ContrastBackground/ContrastBackground.tres" type="Material" id=14]
 
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 12 )
@@ -26,7 +27,7 @@ _level_controller = NodePath("LevelController")
 _goal = NodePath("Geometry/Goal")
 _left_wall = NodePath("Geometry/LeftWall")
 _floor_ = NodePath("Geometry/Floor")
-_fade_in = [ NodePath("Geometry/Arrows"), NodePath("Geometry/Label") ]
+_fade_in = [ NodePath("Geometry/Arrows"), NodePath("LabelOrigin/Label") ]
 _tension_bar = NodePath("HUD/Frame/Margin/Right/Control/Tension")
 intro_anim_time = 1.0
 
@@ -36,7 +37,7 @@ color = Color( 0.129412, 0.129412, 0.129412, 1 )
 [node name="LevelController" parent="." instance=ExtResource( 8 )]
 _character = NodePath("../Character")
 _camera = NodePath("../Character/Camera2D")
-_fade_out = [ NodePath("../Geometry/Label") ]
+_fade_out = [ NodePath("../LabelOrigin/Label") ]
 end_position = Vector2( 2048, -96 )
 _end_screen = NodePath("../HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
@@ -80,18 +81,30 @@ scale = Vector2( 4, 4 )
 texture = ExtResource( 9 )
 offset = Vector2( 0, 8 )
 
-[node name="Label" type="Label" parent="Geometry"]
-margin_left = 302.0
+[node name="Character" parent="." instance=ExtResource( 6 )]
+position = Vector2( 0, -192 )
+
+[node name="Camera2D" type="Camera2D" parent="Character"]
+position = Vector2( 0, -64 )
+process_mode = 0
+
+[node name="LabelOrigin" type="Node2D" parent="."]
+position = Vector2( 440, 0 )
+
+[node name="Label" type="Label" parent="LabelOrigin"]
+material = ExtResource( 14 )
+margin_left = -134.0
 margin_top = -64.0
-margin_right = 578.0
+margin_right = 134.0
 grow_horizontal = 2
 theme = ExtResource( 13 )
-text = "This way"
+text = "this way"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="Geometry/Label"]
+[node name="Label" type="Label" parent="LabelOrigin/Label"]
+use_parent_material = true
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -99,13 +112,6 @@ text = " . . ."
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="Character" parent="." instance=ExtResource( 6 )]
-position = Vector2( 0, -192 )
-
-[node name="Camera2D" type="Camera2D" parent="Character"]
-position = Vector2( 0, -64 )
-process_mode = 0
 
 [node name="HUD" parent="." instance=ExtResource( 4 )]
 
@@ -122,8 +128,8 @@ alpha = 0.0
 [connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
-[connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
+[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="go_to_next_level"]
 [connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="restart" binds= [ 2.0 ]]
 
 [editable path="HUD"]

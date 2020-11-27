@@ -6,7 +6,7 @@ extends Sprite
 signal goal_entered
 
 export(bool) var is_active := true setget _set_active
-export(float) var fade_opacity:float = 0 setget _set_fade_opacity
+export(float) var fade_opacity:float = 1 setget _set_fade_opacity
 export(Color) var color := Color(1, 1, 1, 1) setget _set_color
 
 export(NodePath) var _character:NodePath

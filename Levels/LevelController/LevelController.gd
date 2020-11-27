@@ -13,7 +13,7 @@ enum states{
 	COMPLETE_1,
 	COMPLETE_2,
 	COMPLETE_3,
-	TO_NEXT_LEVEL
+	NEXT_LEVEL_TRANSITION
 }
 var state:int = states.INACTIVE setget set_state
 
@@ -54,6 +54,7 @@ onready var wheel_positions:PoolVector2Array# = [character.wheel.global_position
 #var wheel_positions_init:PoolVector2Array
 onready var wheel_rotations:PoolRealArray# = [character.wheel.global_rotation]
 #var wheel_rotations_init:PoolRealArray
+var index_array:PoolIntArray
 var test_data:PoolIntArray
 var frame_num:int = 0
 
@@ -75,12 +76,14 @@ func _ready():
 	body_rotations.resize(history_max_size)
 	wheel_positions.resize(history_max_size)
 	wheel_rotations.resize(history_max_size)
+	index_array.resize(history_max_size)
+	
 	test_data.resize(history_max_size)
 	for i in test_data.size():
 		test_data[i] = -1
 
-
-func _process(delta):
+                     #skip_size:       1,  2,  4,  8, 16, 32, 64
+func _process(delta):#starting points: 0,  1,  2,  4,  8, 16, 32
 	match state:
 		states.PLAYING:
 			# The following code does (should do) the following:  (needed for rewind effect)
@@ -96,19 +99,39 @@ func _process(delta):
 			# every 4 frames, skipping 4 frames forward in the arrays each time.
 			# This is repeted until recording is done.
 			frames_since_last_write += 1
-			if frames_since_last_write >= skip_size:
+			if frames_since_last_write >= skip_size:#TODO: MATH BELOW HERE NOT FINISHED! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 				frames_since_last_write = 0
-				var index:int = (history_length * skip_size + skip_size / 2) % history_max_size
+				#var position:int = history_length * skip_size + skip_size / 2
+				#var index:int = (position + position / history_max_size) % history_max_size
+				#var index = history_length * skip_size
+				#if index / history_max_size > skip_size / 2:
+				#	index += skip_size / 4 + skip_size / 2#This only works the first time looping over
+				#else:
+				#	index += skip_size / 2
+				#index %= history_max_size
+				var index:int
+				if skip_size > 1:
+					print("got pos ", index_array[history_length], " at ", history_length)
+					var read_index = history_length * 2 - history_max_size + 1
+					index = index_array[read_index]
+					index_array[history_length] = index_array[history_length] * 2 - history_max_size / 2 + 1
+					index_array[history_length - history_max_size / 2] *= 2
+				else:
+					index = history_length
+					index_array[history_length] = index
+				
 				body_positions[index] = character.body.global_position
 				body_rotations[index] = character.body.global_rotation
 				wheel_positions[index] = character.wheel.global_position
 				wheel_rotations[index] = character.wheel.global_rotation
 				print(frame_num, " over ", test_data[index], " on ", history_length, "*", skip_size)
 				test_data[index] = frame_num
+				
 				if history_length + 1 < history_max_size:
 					history_length += 1
 				else:#This probably doesn't work after skip_size gets near/over history_max_size, but that would take quite a while
 					history_length = history_max_size / 2
+					frames_since_last_write = skip_size
 					skip_size *= 2
 					print(test_data)
 			frame_num += 1
@@ -230,17 +253,17 @@ func restart(time:float = 1, override:bool = false):
 				tween.interpolate_method(self, "set_fade_out_alpha",
 					0, 1, time/2, Tween.TRANS_QUAD, Tween.EASE_OUT)
 				tween.interpolate_method(self, "set_character_state",
-					Color( character.global_position.x, character.global_position.y,
+					Color( character.wheel.global_position.x, character.wheel.global_position.y,
 						character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
 					Color( body_positions[last].x, body_positions[last].y,
-						body_rotations[last], character.body.global_position.distance_to(character.wheel.global_position) ),
+						body_rotations[last], body_positions[last].distance_to(wheel_positions[last]) ),
 					time/2, Tween.TRANS_EXPO, Tween.EASE_IN)
 				tween.interpolate_deferred_callback(self, time/2, "restart", time/2, true)
 				tween.start()
 
 func go_to_next_level():
 	end_screen.active = false
-	set_state(states.TO_NEXT_LEVEL)
+	set_state(states.NEXT_LEVEL_TRANSITION)
 	tween.interpolate_method(self, "set_character_state",
 		Color( character.wheel.global_position.x, character.wheel.global_position.y,
 			character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),

@@ -73,6 +73,7 @@ singletons=[ "res://git_api.gdnlib" ]
 
 theme/use_hidpi=true
 theme/custom="res://Themes/DefaultTheme.tres"
+common/snap_controls_to_pixels=false
 
 [input]
 

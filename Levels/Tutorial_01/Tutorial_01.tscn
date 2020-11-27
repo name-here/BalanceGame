@@ -19,6 +19,7 @@ _camera = NodePath("Camera2D")
 _goal = NodePath("Geometry/Goal")
 _floor_ = NodePath("Geometry/Floor")
 _wall = NodePath("Geometry/Wall")
+wall_width = 16.0
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
 color = Color( 0.129412, 0.129412, 0.129412, 1 )

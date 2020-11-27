@@ -20,7 +20,7 @@ func _ready():
 func _process(_delta):
 	visible = color.a > 0
 	if visible:
-		material.set_shader_param("color", color)
+		material.set_shader_param("color", color)#TODO: This should be done only when color is changed, not every frame.
 	#if frame_count >= 2:
 	#	frame_count = 0
 	#	#Potential leak here?  If so, should get old texturee and free() before overwriting
