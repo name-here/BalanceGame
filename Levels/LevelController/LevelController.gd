@@ -42,8 +42,11 @@ export(float) var next_level_anim_time:float = 1.0
 var rewind_time:float = 1#Number of seconds it takes to rewind
 var rewind_time_left:float = 1#Number of seconds left for rewind
 
-const history_max_size:int = 8#Is a power of 2 for simpler code/math
+const history_max_size:int = 	16#Is a power of 2 for simpler code/math
 var history_length:int = 0
+#var write_pos:int = 0
+var this_cycle_start_pos:int = 0
+var this_cycle_write_count:int = 0
 var skip_size:int = 1
 var frames_since_last_write = 0
 onready var body_positions:PoolVector2Array# = [character.body.global_position]
@@ -54,7 +57,8 @@ onready var wheel_positions:PoolVector2Array# = [character.wheel.global_position
 #var wheel_positions_init:PoolVector2Array
 onready var wheel_rotations:PoolRealArray# = [character.wheel.global_rotation]
 #var wheel_rotations_init:PoolRealArray
-var index_array:PoolIntArray
+#var index_array:PoolIntArray
+
 var test_data:PoolIntArray
 var frame_num:int = 0
 
@@ -76,7 +80,7 @@ func _ready():
 	body_rotations.resize(history_max_size)
 	wheel_positions.resize(history_max_size)
 	wheel_rotations.resize(history_max_size)
-	index_array.resize(history_max_size)
+	#index_array.resize(history_max_size)
 	
 	test_data.resize(history_max_size)
 	for i in test_data.size():
@@ -109,16 +113,17 @@ func _process(delta):#starting points: 0,  1,  2,  4,  8, 16, 32
 				#else:
 				#	index += skip_size / 2
 				#index %= history_max_size
-				var index:int
-				if skip_size > 1:
-					print("got pos ", index_array[history_length], " at ", history_length)
-					var read_index = history_length * 2 - history_max_size + 1
-					index = index_array[read_index]
-					index_array[history_length] = index_array[history_length] * 2 - history_max_size / 2 + 1
-					index_array[history_length - history_max_size / 2] *= 2
-				else:
-					index = history_length
-					index_array[history_length] = index
+				#var index:int
+				#if skip_size > 1:
+				#	print("got pos ", index_array[history_length], " at ", history_length)
+				#	var read_index = history_length * 2 - history_max_size + 1
+				#	index = index_array[read_index]
+				#	index_array[history_length] = index_array[history_length] * 2 - history_max_size / 2 + 1
+				#	index_array[history_length - history_max_size / 2] *= 2
+				#else:
+				#	index = history_length
+				#	index_array[history_length] = index
+				var index:int = this_cycle_start_pos + this_cycle_write_count * skip_size
 				
 				body_positions[index] = character.body.global_position
 				body_rotations[index] = character.body.global_rotation
@@ -127,15 +132,30 @@ func _process(delta):#starting points: 0,  1,  2,  4,  8, 16, 32
 				print(frame_num, " over ", test_data[index], " on ", history_length, "*", skip_size)
 				test_data[index] = frame_num
 				
-				if history_length + 1 < history_max_size:
-					history_length += 1
-				else:#This probably doesn't work after skip_size gets near/over history_max_size, but that would take quite a while
+				history_length += 1
+				if history_length >= history_max_size:#This section might not work after skip_size gets near/over history_max_size, but that would take quite a while
 					history_length = history_max_size / 2
 					frames_since_last_write = skip_size
+					#write_pos = skip_size
+					this_cycle_write_count = 0
+					this_cycle_start_pos = skip_size
 					skip_size *= 2
+					index = 0
 					print(test_data)
+				#else:
+				#	write_pos += skip_size
+				#if write_pos >= history_max_size:
+				#	print(write_pos - history_max_size)
+				else:
+					if index + skip_size >= history_max_size:
+						print("looped")
+						this_cycle_write_count = 0
+						this_cycle_start_pos = skip_size / 4 + skip_size / 2
+					else:
+						this_cycle_write_count += 1
+			
 			frame_num += 1
-					
+		
 		
 		states.RESTARTING:
 			if history_length > 0 and rewind_time_left >= 0:

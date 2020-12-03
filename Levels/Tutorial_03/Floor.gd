@@ -31,4 +31,7 @@ func _set_slope_center() -> void:
 	slope_center.global_position = polygon.global_position + (slope_points[0] + slope_points[1]) / 2
 	slope_center.global_rotation = polygon.global_rotation + \
 		asin( (slope_points[1].y - slope_points[0].y) / (slope_points[1].x - slope_points[0].x) )
-	print(slope_center.rotation)
+
+
+func _on_polygon_changed(poylgon):
+	_set_slope_center()
