@@ -42,25 +42,69 @@ export(float) var next_level_anim_time:float = 1.0
 var rewind_time:float = 1#Number of seconds it takes to rewind
 var rewind_time_left:float = 1#Number of seconds left for rewind
 
-const history_max_size:int = 	16#Is a power of 2 for simpler code/math
+const history_max_length:int = 	1024#Is even for simpler code/math
 var history_length:int = 0
-#var write_pos:int = 0
-var this_cycle_start_pos:int = 0
-var this_cycle_write_count:int = 0
-var skip_size:int = 1
-var frames_since_last_write = 0
-onready var body_positions:PoolVector2Array# = [character.body.global_position]
-#var body_positions_init:PoolVector2Array
-onready var body_rotations:PoolRealArray# = [character.body.global_rotation]
-#var body_rotations_init:PoolRealArray
-onready var wheel_positions:PoolVector2Array# = [character.wheel.global_position]
-#var wheel_positions_init:PoolVector2Array
-onready var wheel_rotations:PoolRealArray# = [character.wheel.global_rotation]
-#var wheel_rotations_init:PoolRealArray
-#var index_array:PoolIntArray
+var history_wait_frames:int = 1
+var history_frames_waited = 0
 
-var test_data:PoolIntArray
+# history_buffers stores 2 buffers, each containing Pool[Type]Arrays
+# that track elements of the level state (object positions, etc.) over time
+var history_buffers := [null, null]
+var history_active_buffer:int = 0#Should be 0 or 1 for first or second buffer
+var history_is_first_write := true
+#var level_state_init:Array#Stores starting state of the level
+
+var test_data := [null, null]
 var frame_num:int = 0
+
+
+# "virtual" functions that can be overridden by classes that extend LevelState
+# to track more properties of the level state (additional objects' positions, etc.)
+func _initialize_history_buffers(buffer_array:Array, length:int):
+	var body_positions:PoolVector2Array#These lines work around the commented-out code below not working
+	body_positions.resize(length)
+	var body_rotations:PoolRealArray
+	body_rotations.resize(length)
+	var wheel_positions:PoolVector2Array
+	wheel_positions.resize(length)
+	var wheel_rotations:PoolRealArray
+	wheel_rotations.resize(length)
+	var buffer_init := [body_positions, body_rotations, wheel_positions, wheel_rotations]
+	var test_data_init:PoolIntArray
+	test_data_init.resize(length)
+	for i in test_data_init.size():
+		test_data_init[i] = i
+	for buffer_index in buffer_array.size():
+		test_data[buffer_index] = test_data_init
+		buffer_array[buffer_index] = buffer_init.duplicate(true)
+		#for tracker_index in buffer_array[buffer_index].size(): This doesn't work in 3.2.3, so workaround used instead.
+		# Doesn't set length because buffer_array[a][b] gets value, not reference
+		#	buffer_array[buffer_index][tracker_index].resize(length)
+		#	print(buffer_array[buffer_index][tracker_index].size(), " should be ", length)
+
+#func _set_initial_state(state_array:Array):
+#	state_array = [
+#		character.body.global_position,
+#		character.body.global_rotation,
+#		character.wheel.global_position,
+#		character.wheel.global_rotation,
+#	]
+
+func _write_state(buffer:Array, index:int):
+	buffer[0][index] = character.body.global_position
+	buffer[1][index] = character.body.global_rotation
+	buffer[2][index] = character.wheel.global_position
+	buffer[3][index] = character.wheel.global_rotation
+
+func _read_state(buffer:Array, index:int):
+	character.body.global_position = buffer[0][index]
+	character.body.global_rotation = buffer[1][index]
+	character.wheel.global_position = buffer[2][index]
+	character.wheel.global_rotation = buffer[3][index]
+
+func _copy_state(from_buffer:Array, from_index:int, to_buffer:Array, to_index:int):
+	for i in to_buffer.size():
+		to_buffer[i][to_index] = from_buffer[i][from_index]
 
 
 func _ready():
@@ -72,87 +116,58 @@ func _ready():
 		assert(element is CanvasItem)
 		fade_out.append(element)
 	
-	#body_positions_init = body_positions
-	#body_rotations_init = body_rotations
-	#wheel_positions_init = wheel_positions
-	#wheel_rotations_init = wheel_rotations
-	body_positions.resize(history_max_size)
-	body_rotations.resize(history_max_size)
-	wheel_positions.resize(history_max_size)
-	wheel_rotations.resize(history_max_size)
-	#index_array.resize(history_max_size)
+	_initialize_history_buffers(history_buffers, history_max_length)
+	#_set_initial_state(level_state_init)
+	for buffer in history_buffers:
+		_write_state(buffer, 0)
+	#level_state_init.resize(history_buffers[0].size())
+	#This is hugely inefficient (copies whole array, then immediately resizes it)
+	#for i in history_buffers[0].size():
+	#	level_state_init[i] = history_buffers[0][i]
+	#	level_state_init[i].resize(1)
+	#_write_state(level_state_init, 0)
 	
-	test_data.resize(history_max_size)
-	for i in test_data.size():
-		test_data[i] = -1
+	#for array in test_data:
+	#	for elem in array:
+	#		elem = -1
 
-                     #skip_size:       1,  2,  4,  8, 16, 32, 64
-func _process(delta):#starting points: 0,  1,  2,  4,  8, 16, 32
+
+func _process(delta):
 	match state:
 		states.PLAYING:
 			# The following code does (should do) the following:  (needed for rewind effect)
 			# Start by writing character data to the history arrays.
-			# When the whole array has been written, go back and overwrite every
-			# other value (starting with the second), but twice as slowly
-			# (every other frame).  This cuts time resolution in half,
-			# and lets the program keep writing data without having to stop and
-			# reorder this history arrays.  Playback happens in constant time,
-			# so halved time resolution is (probably) not so noticable.
-			# Next time it reaches history_max_size, cut time resolution in half
-			# again, this time starting with the third value and writing
-			# every 4 frames, skipping 4 frames forward in the arrays each time.
-			# This is repeted until recording is done.
-			frames_since_last_write += 1
-			if frames_since_last_write >= skip_size:#TODO: MATH BELOW HERE NOT FINISHED! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				frames_since_last_write = 0
-				#var position:int = history_length * skip_size + skip_size / 2
-				#var index:int = (position + position / history_max_size) % history_max_size
-				#var index = history_length * skip_size
-				#if index / history_max_size > skip_size / 2:
-				#	index += skip_size / 4 + skip_size / 2#This only works the first time looping over
-				#else:
-				#	index += skip_size / 2
-				#index %= history_max_size
-				#var index:int
-				#if skip_size > 1:
-				#	print("got pos ", index_array[history_length], " at ", history_length)
-				#	var read_index = history_length * 2 - history_max_size + 1
-				#	index = index_array[read_index]
-				#	index_array[history_length] = index_array[history_length] * 2 - history_max_size / 2 + 1
-				#	index_array[history_length - history_max_size / 2] *= 2
-				#else:
-				#	index = history_length
-				#	index_array[history_length] = index
-				var index:int = this_cycle_start_pos + this_cycle_write_count * skip_size
+			# When the whole array has been written, 
+			# 
+			history_frames_waited += 1
+			if history_frames_waited >= history_wait_frames:#TODO: MATH BELOW HERE NOT FINISHED! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				history_frames_waited = 0
+				var index:int
 				
-				body_positions[index] = character.body.global_position
-				body_rotations[index] = character.body.global_rotation
-				wheel_positions[index] = character.wheel.global_position
-				wheel_rotations[index] = character.wheel.global_rotation
-				print(frame_num, " over ", test_data[index], " on ", history_length, "*", skip_size)
-				test_data[index] = frame_num
+				# Write data to current buffer
+				_write_state(history_buffers[history_active_buffer], history_length)
+				test_data[history_active_buffer][history_length] = frame_num
+				print("wrote ", frame_num, " to ", history_length, " in buffer ", history_active_buffer)
+				# Copy past data into first half of active buffer (if not on first write)
+				if !history_is_first_write:
+					var write_index:int = history_length - history_max_length / 2
+					_copy_state(history_buffers[int(!history_active_buffer)], write_index * 2,
+						history_buffers[history_active_buffer], write_index)
+					test_data[history_active_buffer][write_index] = test_data[int(!history_active_buffer)][write_index*2]
+					print("copied ",test_data[history_active_buffer][write_index]," from index ",write_index*2," in buffer ",history_active_buffer," to index ",write_index," in buffer ",int(!history_active_buffer))
+				#print(frame_num, " over ", test_data[index], " on ", history_length, "*", history_wait_frames)
+				#test_data[index] = frame_num
 				
 				history_length += 1
-				if history_length >= history_max_size:#This section might not work after skip_size gets near/over history_max_size, but that would take quite a while
-					history_length = history_max_size / 2
-					frames_since_last_write = skip_size
-					#write_pos = skip_size
-					this_cycle_write_count = 0
-					this_cycle_start_pos = skip_size
-					skip_size *= 2
-					index = 0
-					print(test_data)
-				#else:
-				#	write_pos += skip_size
-				#if write_pos >= history_max_size:
-				#	print(write_pos - history_max_size)
-				else:
-					if index + skip_size >= history_max_size:
-						print("looped")
-						this_cycle_write_count = 0
-						this_cycle_start_pos = skip_size / 4 + skip_size / 2
-					else:
-						this_cycle_write_count += 1
+				if history_length >= history_max_length:
+					history_is_first_write = false
+					history_length = history_max_length / 2
+					# We're about to throw out the last data point we wrote,
+					# so wait half as long to keep the delay even
+					history_frames_waited = history_wait_frames
+					history_wait_frames *= 2
+					history_active_buffer = int(!history_active_buffer)
+					#print(test_data)
 			
 			frame_num += 1
 		
@@ -164,33 +179,36 @@ func _process(delta):#starting points: 0,  1,  2,  4,  8, 16, 32
 					push_error( str("positions: ", history_length-1, ", time: ", rewind_time_left, ", length: ", rewind_time, ", frame: ", rewind_frame) )
 					assert(rewind_frame >= 0)
 				else:
-					# This unravels the somwhat complicated interwoven values
-					# created by the system (described) above.
-					var index:int = (rewind_frame * skip_size + skip_size / 2) % history_max_size#NOT FINISHED! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-					character.body.global_position = body_positions[index]
-					character.body.global_rotation = body_rotations[index]
-					character.wheel.global_position = wheel_positions[index]
-					character.wheel.global_rotation = wheel_rotations[index]
-					print("got ", test_data[index], " for ", rewind_frame)
+					# This plays back the data created above (split between
+					# 2 buffers) in the correct reverse order
+					if history_is_first_write or rewind_frame >= history_max_length / 2:
+						_read_state(history_buffers[history_active_buffer], rewind_frame)
+						print("got ", test_data[history_active_buffer][rewind_frame], " for ", rewind_frame, " in buffer ", history_active_buffer)
+					else:
+						_read_state(history_buffers[int(!history_active_buffer)], rewind_frame * 2)
+						print("got ", test_data[int(!history_active_buffer)][rewind_frame*2], " for ", rewind_frame, " in buffer ", int(!history_active_buffer))
+						
+					#print("got ", test_data[index], " for ", rewind_frame)
 					rewind_time_left -= delta
 			else:
 				rewind_time_left = 0
 				history_length = 0
-				skip_size = 1
-				frames_since_last_write = 0
-				for i in test_data.size():
-					test_data[i] = -1
+				history_wait_frames = 1#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				history_frames_waited = 0
+				history_is_first_write = true
+				#for i in test_data.size():
+				#	test_data[i] = -1
 				frame_num = 0
-				#body_positions = body_positions_init
+				#body_positions = body_positions_init<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 				#body_rotations = body_rotations_init
 				#wheel_positions = wheel_positions_init
 				#wheel_rotations = wheel_rotations_init
-				if body_positions.size() > 0:
-					character.body.global_position = body_positions[0]
-					character.body.global_rotation = body_rotations[0]
-					character.wheel.global_position = wheel_positions[0]
-					character.wheel.global_rotation = wheel_rotations[0]
-					print("got ", test_data[0], " for 0")
+				#if body_positions.size() > 0:
+				#	character.body.global_position = body_positions[0]
+				#	character.body.global_rotation = body_rotations[0]
+				#	character.wheel.global_position = wheel_positions[0]
+				#	character.wheel.global_rotation = wheel_rotations[0]
+				#	print("got ", test_data[0], " for 0")
 				set_state(states.PAUSED)
 				tween.interpolate_property(rewind_overlay, "color:a", rewind_overlay.color.a, 0, 0.5)
 				tween.interpolate_deferred_callback(self, 0.5, "play")
@@ -251,6 +269,7 @@ func restart(time:float = 1, override:bool = false):
 		assert(time > 0)
 		time = 1.0
 	if override or state == states.PLAYING:
+		print(test_data[0], "\n", test_data[1])
 		set_physics(false)
 		emit_signal("on_restart", time)
 		character.body.angular_velocity = 0
@@ -272,12 +291,12 @@ func restart(time:float = 1, override:bool = false):
 					1, 0, time/2, Tween.TRANS_EXPO, Tween.EASE_OUT)
 				tween.interpolate_method(self, "set_fade_out_alpha",
 					0, 1, time/2, Tween.TRANS_QUAD, Tween.EASE_OUT)
-				tween.interpolate_method(self, "set_character_state",
-					Color( character.wheel.global_position.x, character.wheel.global_position.y,
-						character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
-					Color( body_positions[last].x, body_positions[last].y,
-						body_rotations[last], body_positions[last].distance_to(wheel_positions[last]) ),
-					time/2, Tween.TRANS_EXPO, Tween.EASE_IN)
+				#tween.interpolate_method(self, "set_character_state",<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				#	Color( character.wheel.global_position.x, character.wheel.global_position.y,
+				#		character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
+				#	Color( body_positions[last].x, body_positions[last].y,
+				#		body_rotations[last], body_positions[last].distance_to(wheel_positions[last]) ),
+				#	time/2, Tween.TRANS_EXPO, Tween.EASE_IN)
 				tween.interpolate_deferred_callback(self, time/2, "restart", time/2, true)
 				tween.start()
 
