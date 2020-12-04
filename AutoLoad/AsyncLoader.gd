@@ -78,7 +78,7 @@ func _loader_thread(data):
 				call_deferred( "_callback_complete", request, loader.get_resource() )
 				break
 			elif err == OK:
-				call_deferred( "_callback_progress", request, 100.0 * loader.get_stage() / loader.get_stage_count() )
+				_callback_progress(request, 100.0 * loader.get_stage() / loader.get_stage_count())
 				err = loader.poll()
 			else:
 				call_deferred("push_error", err)
@@ -89,7 +89,7 @@ func _callback_progress(request:LoadRequest, percent:float):
 		request.progress_callback.call_func(percent)
 
 func _callback_complete(request:LoadRequest, resource):
-	_callback_progress(request, 100.0)
+	call_deferred("_callback_progress", request, 100.0)
 	if request.completion_callback.is_valid():
 		request.completion_callback.call_func(resource)
 

@@ -58,11 +58,16 @@ func _update_progress(new_progress:float):
 	progress = new_progress
 	emit_signal("progress_changed", new_progress)
 
+# This function gets called in the loader thread instead of the main thread,
+# allowing the scene to be instanced without potentially freezing the main thread.
 func _scene_loaded(scene):
 	if scene != null:
-		loading_scene = scene.instance()
-		emit_signal("progress_changed", 100.0)
-		emit_signal("scene_loaded")
-		#call_deferred("switch_scene")
+		call_deferred("_update_scene", scene.instance())
 	else:
 		push_error("Error: Could not load scene from specified path \"%s\"."%scenes[loading_scene_index])
+
+func _update_loading_scene(scene_instance):#should only ever be called deferred
+	loading_scene = scene_instance
+	#switch_scene()
+	#emit_signal("progress_changed", 100.0)#_update_progress is already called with 100% on completion
+	emit_signal("scene_loaded")
