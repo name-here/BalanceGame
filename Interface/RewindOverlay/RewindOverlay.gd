@@ -8,6 +8,7 @@ var frame_count:int = 0
 
 
 func _ready():
+	material = material.duplicate()
 	#material.set_shader_param("testTexture", get_viewport().get_texture())#.duplicate())
 	for i in buffer_names.size():
 		var image := Image.new()
