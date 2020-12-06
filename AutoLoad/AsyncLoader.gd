@@ -13,17 +13,14 @@ class LoadRequest:
 		completion_callback = set_completion_callback
 		progress_callback = set_progress_callback
 
-class Callback:
-	var callback_func:FuncRef
-	var data
+
+const thread_count = 1
 
 var request_queue:Array
 onready var request_queue_mutex:Mutex = Mutex.new()
 
 var callback_queue:Array
 onready var callback_queue_mutex:Mutex = Mutex.new()
-
-const thread_count = 1
 
 var threads:Array
 onready var semaphore:Semaphore = Semaphore.new()
