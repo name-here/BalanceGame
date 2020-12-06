@@ -4,6 +4,9 @@ extends Node2D
 export(NodePath) var _level_controller:NodePath
 onready var level_controller:Node = get_node(_level_controller)
 
+var scene_loader:SceneLoader
+var has_scene_loader := false
+
 export(NodePath) var _goal:NodePath
 onready var goal:Sprite = get_node(_goal)
 export(NodePath) var _left_wall:NodePath
@@ -20,6 +23,12 @@ export(float) var intro_anim_time:float = 2
 
 
 func _ready():
+	level_controller.stop()
+	
+	has_scene_loader = get_parent() is SceneLoader
+	if has_scene_loader:
+		scene_loader = get_parent()
+	
 	for _element in _fade_in:
 		var element = get_node(_element)
 		assert(element is CanvasItem)
@@ -27,21 +36,22 @@ func _ready():
 
 
 func set_active(value := true) -> void:
-	level_controller.end_position.x = goal.global_position.x
 	level_controller.set_active(value)
-	_on_window_resize()
-	level_controller.pause()
-	
-	for element in fade_in:
-		element.modulate.a = 0
-		level_controller.tween.interpolate_property(element, "modulate:a",
-			0, 1, intro_anim_time)
-	left_wall.global_position.x -= 64
-	level_controller.tween.interpolate_property(left_wall, "global_position:x",
-		left_wall.global_position.x, left_wall.global_position.x + 64,
-		intro_anim_time, Tween.TRANS_CUBIC, Tween.EASE_OUT)
-	level_controller.tween.interpolate_deferred_callback(self, intro_anim_time, "_on_intro_anim_done")
-	level_controller.tween.start()
+	if value:
+		level_controller.end_position.x = goal.global_position.x
+		_on_window_resize()
+		level_controller.pause()
+		
+		for element in fade_in:
+			element.modulate.a = 0
+			level_controller.tween.interpolate_property(element, "modulate:a",
+				0, 1, intro_anim_time)
+		left_wall.global_position.x -= 64
+		level_controller.tween.interpolate_property(left_wall, "global_position:x",
+			left_wall.global_position.x, left_wall.global_position.x + 64,
+			intro_anim_time, Tween.TRANS_CUBIC, Tween.EASE_OUT)
+		level_controller.tween.interpolate_deferred_callback(self, intro_anim_time, "_on_intro_anim_done")
+		level_controller.tween.start()
 
 func _on_intro_anim_done() -> void:
 	get_viewport().connect("size_changed", self, "_on_window_resize")
@@ -49,7 +59,14 @@ func _on_intro_anim_done() -> void:
 
 
 func _on_level_state_changed(new_state:int, last_state:int):
-	pass
+	match new_state:
+		level_controller.states.NEXT_LEVEL_TRANSITION:
+			pass
+
+func restart_game() -> void:
+	
+	if has_scene_loader:
+		scene_loader.load_scene(0)
 
 func _on_level_on_restart(time:int):
 	pass

@@ -22,7 +22,7 @@ shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = ExtResource( 13 )
-shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.305882 )
+shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.32549 )
 
 [node name="Tutorial_01" type="Node2D"]
 script = ExtResource( 5 )
@@ -108,8 +108,9 @@ __meta__ = {
 visible = false
 
 [node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 12 )]
+visible = false
 material = SubResource( 2 )
-color = Color( 0.635294, 0.827451, 0.87451, 0.305882 )
+color = Color( 0.635294, 0.827451, 0.87451, 0 )
 
 [node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
 visible = false

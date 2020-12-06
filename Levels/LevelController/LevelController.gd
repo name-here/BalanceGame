@@ -244,13 +244,17 @@ func next_complete_anim() -> void:
 			end_screen.active = true
 
 
+func play() -> void:
+	set_physics(true)
+	set_state(states.PLAYING)
+
 func pause() -> void:
 	set_physics(false)
 	set_state(states.PAUSED)
 
-func play() -> void:
-	set_physics(true)
-	set_state(states.PLAYING)
+func stop() -> void:
+	set_physics(false)
+	set_state(states.INACTIVE)
 
 func restart(time:float = 1, override:bool = false):
 	if time <= 0:
@@ -320,10 +324,10 @@ func set_physics(value:bool):
 func set_active(value := true):
 	if value:
 		camera.make_current()
-		set_state(states.PLAYING)
-		
+		character.update_mouse(get_viewport().get_mouse_position())
+		play()
 	else:
-		set_state(states.INACTIVE)
+		stop()
 
 
 func interpolate_level_states(weight:float):

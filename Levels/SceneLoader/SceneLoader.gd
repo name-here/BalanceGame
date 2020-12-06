@@ -17,8 +17,8 @@ var progress:float
 
 
 func _ready():
-	if not scenes_folder.ends_with("/"):
-		scenes_folder += "/"
+	if scenes_folder.ends_with("/"):
+		scenes_folder.erase(scenes_folder.length() - 1, 1)
 	load_scene(starting_scene)
 
 func load_scene(index:int):
@@ -27,9 +27,9 @@ func load_scene(index:int):
 		var packed_scene:PackedScene = ResourceLoader.load(scenes_folder+"/"+scenes[index]+"/"+scenes[index]+".tscn")
 		if packed_scene != null:
 			loading_scene = packed_scene.instance()
-			switch_scene()
+			call_deferred("switch_scene")
 		else:
-			push_error("Error: Could not load scene from specified path \"%s\"."%scenes[starting_scene])
+			push_error("Error: Could not load scene from specified path: \"%s\"."%scenes[starting_scene])
 	else:
 		push_error("Error: Invalid index %i given for loading scene.  There are only %i scenes."%index%scenes.size())
 

@@ -35,11 +35,12 @@ func set_active(value := true) -> void:
 	_on_window_resize()
 	get_viewport().connect("size_changed", self, "_on_window_resize")
 
-func start_next_level():
+func start_next_level():#Move logic in this and _on_next_level_loaded to LevelController
 	if next_level_ready:
 		level_controller.tween.remove_all()
 		Physics2DServer.set_active(true)
 		scene_loader.call_deferred("switch_scene")
+		#scene_loader.load_scene(1)
 	else:
 		switch_when_ready = true
 

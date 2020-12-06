@@ -140,12 +140,36 @@ color = Color( 0.635294, 0.827451, 0.87451, 0 )
 [node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
 visible = false
 alpha = 0.0
+
+[node name="MarginContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="0"]
+margin_bottom = 276.0
+
+[node name="CompletedText" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="0"]
+visible = false
+
+[node name="VBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="1"]
+visible = true
+
+[node name="HBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="1"]
+margin_top = 284.0
+margin_bottom = 444.0
+
+[node name="Replay" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 1024.0
+
+[node name="Button" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer/Replay" index="0"]
+margin_right = 1016.0
+
+[node name="Continue" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="1"]
+visible = false
 [connection signal="on_restart" from="LevelController" to="." method="_on_level_on_restart"]
 [connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
 [connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="go_to_next_level"]
-[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="restart" binds= [ 2.0 ]]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart_game"]
 
 [editable path="HUD"]
+
+[editable path="HUD/Frame/EndScreen"]
