@@ -62,7 +62,7 @@ func _update_progress(new_progress:float):
 # allowing the scene to be instanced without potentially freezing the main thread.
 func _scene_loaded(scene):
 	if scene != null:
-		call_deferred("_update_scene", scene.instance())
+		call_deferred("_update_loading_scene", scene.instance())
 	else:
 		push_error("Error: Could not load scene from specified path \"%s\"."%scenes[loading_scene_index])
 

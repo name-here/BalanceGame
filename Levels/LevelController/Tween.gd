@@ -1,6 +1,6 @@
 extends Tween
 
-export(bool) var ignore_engine_timescale := false
+export(bool) var ignore_engine_time_scale := false
 
 
 # This code makes tweening Engine.time_scale work.
@@ -10,11 +10,11 @@ export(bool) var ignore_engine_timescale := false
 # It seems like this code has to be here,
 # though it would make more sense in LevelController.
 func _physics_process(_delta):
-	if ignore_engine_timescale:
+	if ignore_engine_time_scale:
 		if Engine.time_scale > 0:
 			playback_speed = 1 / Engine.time_scale
 		else:
 			remove(Engine, "time_scale")
-			ignore_engine_timescale = false
+			ignore_engine_time_scale = false
 			playback_speed = 1
 			Engine.time_scale = 1

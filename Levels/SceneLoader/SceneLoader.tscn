@@ -6,4 +6,3 @@
 script = ExtResource( 1 )
 scenes_folder = "res://Levels/"
 scenes = [ "Tutorial_01", "Tutorial_02", "Tutorial_03" ]
-starting_scene = 2

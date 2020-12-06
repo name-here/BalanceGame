@@ -1,9 +1,11 @@
 class_name LevelController extends Node2D
 
 
+# warning-ignore:unused_signal
+#(it actually *is* used, but emitted with call_deferred)
 signal state_changed(changed_to, changed_from)
 signal on_restart(time)
-#signal start_next_level
+signal start_next_level
 
 enum states{
 	INACTIVE,
@@ -31,7 +33,7 @@ export(NodePath) var _end_screen:NodePath
 onready var end_screen:EndScreen = get_node(_end_screen)
 
 export(NodePath) var _rewind_overlay:NodePath
-onready var rewind_overlay:ColorRect = get_node(_rewind_overlay)
+onready var rewind_overlay:RewindOverlay = get_node(_rewind_overlay)
 
 export(NodePath) var _tween:NodePath
 onready var tween:Tween = get_node(_tween)
@@ -49,46 +51,41 @@ var history_frames_waited = 0
 
 # history_buffers stores 2 buffers, each containing Pool[Type]Arrays
 # that track elements of the level state (object positions, etc.) over time
-var history_buffers := [null, null]
+var history_buffers := [[], []]
 var history_active_buffer:int = 0#Should be 0 or 1 for first or second buffer
 var history_is_first_write := true
 #var level_state_init:Array#Stores starting state of the level
 
-var test_data := [null, null]
-var frame_num:int = 0
+var transition_state_buffer := Array()
+
+#var frame_num:int = 0
 
 
 # "virtual" functions that can be overridden by classes that extend LevelState
 # to track more properties of the level state (additional objects' positions, etc.)
-func _initialize_history_buffers(buffer_array:Array, length:int):
-	var body_positions:PoolVector2Array#These lines work around the commented-out code below not working
+func _initialize_history_buffer(length:int) -> Array:
+	var body_positions := PoolVector2Array()#These lines work around the commented-out code below not working
 	body_positions.resize(length)
-	var body_rotations:PoolRealArray
+	var body_rotations := PoolRealArray()
 	body_rotations.resize(length)
-	var wheel_positions:PoolVector2Array
+	var wheel_positions := PoolVector2Array()
 	wheel_positions.resize(length)
-	var wheel_rotations:PoolRealArray
+	var wheel_rotations := PoolRealArray()
 	wheel_rotations.resize(length)
-	var buffer_init := [body_positions, body_rotations, wheel_positions, wheel_rotations]
-	var test_data_init:PoolIntArray
-	test_data_init.resize(length)
-	for i in test_data_init.size():
-		test_data_init[i] = i
-	for buffer_index in buffer_array.size():
-		test_data[buffer_index] = test_data_init
-		buffer_array[buffer_index] = buffer_init.duplicate(true)
+	return [body_positions, body_rotations, wheel_positions, wheel_rotations]
+	#buffer = [body_positions, body_rotations, wheel_positions, wheel_rotations].duplicate(true)
+	#var buffer_init := [body_positions, body_rotations, wheel_positions, wheel_rotations]
+	
+	#buffer.resize(buffer_init.size())
+	#for i in buffer_init.size():
+	#	buffer[i] = buffer_init[i]
+	
+	#for buffer_index in buffer_array.size():
+	#	buffer_array[buffer_index] = buffer_init.duplicate(true)
 		#for tracker_index in buffer_array[buffer_index].size(): This doesn't work in 3.2.3, so workaround used instead.
 		# Doesn't set length because buffer_array[a][b] gets value, not reference
 		#	buffer_array[buffer_index][tracker_index].resize(length)
 		#	print(buffer_array[buffer_index][tracker_index].size(), " should be ", length)
-
-#func _set_initial_state(state_array:Array):
-#	state_array = [
-#		character.body.global_position,
-#		character.body.global_rotation,
-#		character.wheel.global_position,
-#		character.wheel.global_rotation,
-#	]
 
 func _write_state(buffer:Array, index:int):
 	buffer[0][index] = character.body.global_position
@@ -101,6 +98,17 @@ func _read_state(buffer:Array, index:int):
 	character.body.global_rotation = buffer[1][index]
 	character.wheel.global_position = buffer[2][index]
 	character.wheel.global_rotation = buffer[3][index]
+
+func _interpolate_state(buffer_1:Array, index_1:int, buffer_2:Array, index_2:int, weight:float):
+	character.body.global_position = buffer_1[0][index_1] + \
+		(buffer_2[0][index_2] - buffer_1[0][index_1]) * weight
+	character.body.global_rotation = buffer_1[1][index_1] + \
+		(buffer_2[1][index_2] - buffer_1[1][index_1]) * weight
+	character.wheel.global_position = buffer_1[2][index_1] + \
+		(buffer_2[2][index_2] - buffer_1[2][index_1]) * weight
+	character.wheel.global_rotation = buffer_1[3][index_1] + \
+		(buffer_2[3][index_2] - buffer_1[3][index_1]) * weight
+	
 
 func _copy_state(from_buffer:Array, from_index:int, to_buffer:Array, to_index:int):
 	for i in to_buffer.size():
@@ -116,21 +124,14 @@ func _ready():
 		assert(element is CanvasItem)
 		fade_out.append(element)
 	
-	_initialize_history_buffers(history_buffers, history_max_length)
-	#_set_initial_state(level_state_init)
-	for buffer in history_buffers:
-		_write_state(buffer, 0)
-	#level_state_init.resize(history_buffers[0].size())
-	#This is hugely inefficient (copies whole array, then immediately resizes it)
-	#for i in history_buffers[0].size():
-	#	level_state_init[i] = history_buffers[0][i]
-	#	level_state_init[i].resize(1)
-	#_write_state(level_state_init, 0)
-	
-	#for array in test_data:
-	#	for elem in array:
-	#		elem = -1
+	for i in history_buffers.size():
+		history_buffers[i] = _initialize_history_buffer(history_max_length)
+	call_deferred("init_level_state")#Calling deferred to make sure stuff is initialized
+	transition_state_buffer = _initialize_history_buffer(2)
 
+func init_level_state() -> void:
+	for i in history_buffers.size():
+		_write_state(history_buffers[i], 0)
 
 func _process(delta):
 	match state:
@@ -140,23 +141,16 @@ func _process(delta):
 			# When the whole array has been written, 
 			# 
 			history_frames_waited += 1
-			if history_frames_waited >= history_wait_frames:#TODO: MATH BELOW HERE NOT FINISHED! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			if history_frames_waited >= history_wait_frames:
 				history_frames_waited = 0
-				var index:int
 				
 				# Write data to current buffer
 				_write_state(history_buffers[history_active_buffer], history_length)
-				test_data[history_active_buffer][history_length] = frame_num
-				print("wrote ", frame_num, " to ", history_length, " in buffer ", history_active_buffer)
-				# Copy past data into first half of active buffer (if not on first write)
+				# Copy earlier data into first half of active buffer (if not on first write)
 				if !history_is_first_write:
 					var write_index:int = history_length - history_max_length / 2
 					_copy_state(history_buffers[int(!history_active_buffer)], write_index * 2,
 						history_buffers[history_active_buffer], write_index)
-					test_data[history_active_buffer][write_index] = test_data[int(!history_active_buffer)][write_index*2]
-					print("copied ",test_data[history_active_buffer][write_index]," from index ",write_index*2," in buffer ",history_active_buffer," to index ",write_index," in buffer ",int(!history_active_buffer))
-				#print(frame_num, " over ", test_data[index], " on ", history_length, "*", history_wait_frames)
-				#test_data[index] = frame_num
 				
 				history_length += 1
 				if history_length >= history_max_length:
@@ -167,9 +161,8 @@ func _process(delta):
 					history_frames_waited = history_wait_frames
 					history_wait_frames *= 2
 					history_active_buffer = int(!history_active_buffer)
-					#print(test_data)
 			
-			frame_num += 1
+			#frame_num += 1
 		
 		
 		states.RESTARTING:
@@ -183,32 +176,20 @@ func _process(delta):
 					# 2 buffers) in the correct reverse order
 					if history_is_first_write or rewind_frame >= history_max_length / 2:
 						_read_state(history_buffers[history_active_buffer], rewind_frame)
-						print("got ", test_data[history_active_buffer][rewind_frame], " for ", rewind_frame, " in buffer ", history_active_buffer)
 					else:
 						_read_state(history_buffers[int(!history_active_buffer)], rewind_frame * 2)
-						print("got ", test_data[int(!history_active_buffer)][rewind_frame*2], " for ", rewind_frame, " in buffer ", int(!history_active_buffer))
 						
-					#print("got ", test_data[index], " for ", rewind_frame)
 					rewind_time_left -= delta
 			else:
 				rewind_time_left = 0
 				history_length = 0
-				history_wait_frames = 1#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				history_wait_frames = 1
 				history_frames_waited = 0
 				history_is_first_write = true
-				#for i in test_data.size():
-				#	test_data[i] = -1
-				frame_num = 0
-				#body_positions = body_positions_init<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				#body_rotations = body_rotations_init
-				#wheel_positions = wheel_positions_init
-				#wheel_rotations = wheel_rotations_init
-				#if body_positions.size() > 0:
-				#	character.body.global_position = body_positions[0]
-				#	character.body.global_rotation = body_rotations[0]
-				#	character.wheel.global_position = wheel_positions[0]
-				#	character.wheel.global_rotation = wheel_rotations[0]
-				#	print("got ", test_data[0], " for 0")
+				#frame_num = 0
+				# Loads starting state (should already be done by code above)
+				#_read_state(history_buffers[0], 0)
+				
 				set_state(states.PAUSED)
 				tween.interpolate_property(rewind_overlay, "color:a", rewind_overlay.color.a, 0, 0.5)
 				tween.interpolate_deferred_callback(self, 0.5, "play")
@@ -228,26 +209,33 @@ func next_complete_anim() -> void:
 		states.COMPLETE_1:
 			tween.interpolate_property(Engine, "time_scale",
 				Engine.time_scale, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
-			#tween.interpolate_callback(self, completion_anim_times[0], "reset_timescales")
+			#tween.interpolate_callback(self, completion_anim_times[0], "reset_time_scales")
 			#tween.interpolate_callback(self, completion_anim_times[0], "set_physics", false)
 			
 			tween.interpolate_method(self, "set_fade_out_alpha",
 				1, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
 			tween.interpolate_callback(self, completion_anim_times[0], "next_complete_anim")
-			tween.ignore_engine_timescale = true
+			tween.ignore_engine_time_scale = true
 			tween.start()
 		
 		states.COMPLETE_2:
-			#reset_timescales()
+			#reset_time_scales()
 			set_physics(false)
 			tween.remove_all()
 			character.update_origin()
-			tween.interpolate_method(self, "set_character_state",
-				Color( character.wheel.global_position.x, character.wheel.global_position.y,
-					character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
-				Color( end_position.x, end_position.y,
-					0, character.body.global_position.distance_to(character.wheel.global_position) ),
-				completion_anim_times[1], Tween.TRANS_CUBIC)
+			
+			# Assumes last and 3rd-to-last elements of inactive buffer are never read
+			_write_state(transition_state_buffer, 0)
+			var distance = character.body.global_position.distance_to(character.wheel.global_position)
+			character.wheel.global_position = end_position + Vector2(0, -96)
+			character.body.global_position = character.wheel.global_position - \
+			Vector2(0, distance)
+			character.body.global_rotation = 0
+			_write_state(transition_state_buffer, 1)
+			_read_state(transition_state_buffer, 0)
+			tween.interpolate_method(self, "interpolate_level_states",
+				0.0, 1.0, completion_anim_times[1], Tween.TRANS_CUBIC)
+			
 			tween.interpolate_method(end_screen, "set_alpha",
 				0, 1, completion_anim_times[1], Tween.TRANS_CUBIC)
 			tween.interpolate_callback(self, completion_anim_times[1], "next_complete_anim")
@@ -269,7 +257,6 @@ func restart(time:float = 1, override:bool = false):
 		assert(time > 0)
 		time = 1.0
 	if override or state == states.PLAYING:
-		print(test_data[0], "\n", test_data[1])
 		set_physics(false)
 		emit_signal("on_restart", time)
 		character.body.angular_velocity = 0
@@ -285,34 +272,40 @@ func restart(time:float = 1, override:bool = false):
 		match state:
 			states.COMPLETE_3:
 				set_state(states.PAUSED)
-				var last = history_length - 1
 				end_screen.active = false
 				tween.interpolate_method(end_screen, "set_alpha",
 					1, 0, time/2, Tween.TRANS_EXPO, Tween.EASE_OUT)
 				tween.interpolate_method(self, "set_fade_out_alpha",
 					0, 1, time/2, Tween.TRANS_QUAD, Tween.EASE_OUT)
-				#tween.interpolate_method(self, "set_character_state",<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				#	Color( character.wheel.global_position.x, character.wheel.global_position.y,
-				#		character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
-				#	Color( body_positions[last].x, body_positions[last].y,
-				#		body_rotations[last], body_positions[last].distance_to(wheel_positions[last]) ),
-				#	time/2, Tween.TRANS_EXPO, Tween.EASE_IN)
+				
+				#Assumes the last element of the inactive buffer is never read
+				_write_state(transition_state_buffer, 0)
+				_copy_state(history_buffers[history_active_buffer], history_length - 1,
+					transition_state_buffer, 1)
+				tween.interpolate_method(self, "interpolate_level_states",
+					0.0, 1.0, time/2, Tween.TRANS_EXPO, Tween.EASE_IN)
+				
 				tween.interpolate_deferred_callback(self, time/2, "restart", time/2, true)
 				tween.start()
 
 func go_to_next_level():
 	end_screen.active = false
 	set_state(states.NEXT_LEVEL_TRANSITION)
-	tween.interpolate_method(self, "set_character_state",
-		Color( character.wheel.global_position.x, character.wheel.global_position.y,
-			character.body.global_rotation, character.body.global_position.distance_to(character.wheel.global_position) ),
-		Color(end_position.x, -48, 0, 144),
-		next_level_anim_time, Tween.TRANS_CUBIC)
+	
+	_write_state(transition_state_buffer, 0)
+	character.body.global_position = end_position + Vector2(0, -192)
+	character.body.global_rotation = 0
+	character.wheel.global_position = end_position + Vector2(0, -48)
+	character.wheel.rotation = 0
+	_write_state(transition_state_buffer, 1)
+	_read_state(transition_state_buffer, 0)
+	tween.interpolate_method(self, "interpolate_level_states",
+		0.0, 1.0, next_level_anim_time, Tween.TRANS_CUBIC)
 	tween.interpolate_property(character.wheel, "rotation",
 		character.wheel.rotation, 0, next_level_anim_time,  Tween.TRANS_CUBIC)
 	tween.interpolate_method(end_screen, "set_alpha",
 		1, 0, next_level_anim_time, Tween.TRANS_EXPO, Tween.EASE_OUT)
-	#tween.interpolate_deferred_callback(self, next_level_anim_time, "emit_signal", "start_next_level")
+	tween.interpolate_deferred_callback(self, next_level_anim_time, "emit_signal", "start_next_level")
 	tween.start()
 
 
@@ -333,28 +326,23 @@ func set_active(value := true):
 		set_state(states.INACTIVE)
 
 
-func set_character_state(new_state:Color):#sets position, rotation, and distance (pos.x, pos.y, rotation, distance)  (Color is just Vector4 in disguise)
-	var new_position := Vector2(new_state[0], new_state[1])
-	#var distance:float = character.body.global_position.distance_to(character.wheel.global_position)
-	character.wheel.global_position = new_position
-	character.body.global_position = new_position + Vector2( sin(new_state[2]), -cos(new_state[2]) ) * new_state[3]#distance
-	character.body.global_rotation = new_state[2]
-	character.connector.global_position = character.wheel.global_position
-	character.connector.global_rotation = character.body.global_rotation
+func interpolate_level_states(weight:float):
+	_interpolate_state(transition_state_buffer, 0,
+		transition_state_buffer, 1, weight)
 
 func set_fade_out_alpha(alpha:float):
 	for element in fade_out:
 		element.modulate.a = alpha
 
-#func reset_timescales():
-#	tween.ignore_engine_timescale = false
+#func reset_time_scales():
+#	tween.ignore_engine_time_scale = false
 #	tween.playback_speed = 1
 #	Engine.time_scale = 1
 
 
 func _on_goal_entered():
 	if state == states.PLAYING:
-		next_complete_anim()
+		call_deferred("next_complete_anim")
 
 func _on_character_hit_floor(collision_position:Vector2, collision_normal:Vector2):
 	#emit particles or whatever

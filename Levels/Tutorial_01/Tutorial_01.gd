@@ -60,10 +60,10 @@ func _on_level_state_changed(new_state:int, last_state:int):
 				scene_loader.connect("scene_loaded", self, "_on_next_level_loaded")
 				scene_loader.load_scene_async(scene_loader.current_scene_index + 1)
 				
-				level_controller.tween.interpolate_property(goal, "fade_opacity",
-					goal.fade_opacity, 0, level_controller.next_level_anim_time)
-				level_controller.tween.interpolate_property(goal, "color",
-					goal.color, Color(127), level_controller.next_level_anim_time)
+				level_controller.tween.interpolate_property(goal, "fade_color:a",
+					goal.fade_color.a, 0, level_controller.next_level_anim_time)
+				level_controller.tween.interpolate_property(goal, "base_color",
+					goal.base_color, Color(127), level_controller.next_level_anim_time)
 				#if get_viewport_rect().size.x / 2 > camera.global_position.x - 16:
 				#	level_controller.tween.interpolate_property(wall, "global_position:x",
 				#		wall.global_position.x, camera.global_position.x - get_viewport_rect().size.x / 2 - wall.scale.x / 2,
@@ -86,7 +86,7 @@ func _on_window_resize():#TODO: Change some of this to not use global properties
 	wall.global_position = Vector2(512 - (new_size.x - wall_width) / 2, -wall.scale.y / 2)
 	#goal.global_position.x = 1024 - 128 - 32
 	
-	level_controller.end_position.x = goal.global_position.x
+	#level_controller.end_position.x = goal.global_position.x
 	#if level_controller.state < level_controller.states.COMPLETE_1:
 	#	camera.global_position.x = 512#new_size.x / 2
 	if level_controller.state > level_controller.states.COMPLETE_1:
