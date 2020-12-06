@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://Levels/Tutorial_02/Tutorial_02.gd" type="Script" id=1]
 [ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=2]
@@ -14,6 +14,7 @@
 [ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=12]
 [ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=13]
 [ext_resource path="res://Materials/ContrastBackground/ContrastBackground.tres" type="Material" id=14]
+[ext_resource path="res://Materials/FrameOverlay/FrameOverlay.shader" type="Shader" id=15]
 
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 12 )
@@ -26,6 +27,10 @@ shader = ExtResource( 12 )
 shader_param/isActive = true
 shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = ExtResource( 15 )
+shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.301961 )
 
 [node name="Tutorial_02" type="Node2D"]
 script = ExtResource( 1 )
@@ -44,7 +49,7 @@ color = Color( 0.129412, 0.129412, 0.129412, 1 )
 _character = NodePath("../Character")
 _camera = NodePath("../Character/Camera2D")
 _fade_out = [ NodePath("../LabelOrigin/Label") ]
-end_position = Vector2( 2048, -96 )
+end_position = Vector2( 2048, 0 )
 _end_screen = NodePath("../HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
 
@@ -65,7 +70,6 @@ script = null
 [node name="Goal" parent="Geometry" instance=ExtResource( 2 )]
 material = SubResource( 2 )
 position = Vector2( 2048, -32 )
-is_active = true
 fade_color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 base_color = Color( 0.564706, 0.807843, 0.643137, 1 )
 _character = NodePath("../../Character")
@@ -92,6 +96,7 @@ offset = Vector2( 0, 8 )
 
 [node name="Character" parent="." instance=ExtResource( 6 )]
 position = Vector2( 0, -192 )
+do_compress_input = false
 
 [node name="Camera2D" type="Camera2D" parent="Character"]
 position = Vector2( 0, -64 )
@@ -129,6 +134,8 @@ visible = false
 
 [node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 10 )]
 visible = false
+material = SubResource( 3 )
+color = Color( 0.635294, 0.827451, 0.87451, 0 )
 
 [node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
 visible = false
