@@ -54,8 +54,8 @@ func set_active(value) -> void:
 	active = value
 
 
-func _restart_pressed():
+func _restart_pressed() -> void:
 	emit_signal("restart_pressed")
 
-func _continue_pressed():
+func _continue_pressed() -> void:
 	emit_signal("continue_pressed")

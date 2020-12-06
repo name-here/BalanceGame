@@ -6,11 +6,11 @@ export(NodePath) var _camera:NodePath
 onready var camera:Camera2D = get_node(_camera)
 
 
-func set_active(value:bool = true):
+func set_active(value:bool = true) -> void:
 	if value:
 		character.update_origin()
 		camera.make_current()
 
-func _input(event):
+func _input(event) -> void:
 	if event.is_action_pressed("reset_level"):
 		get_tree().reload_current_scene()

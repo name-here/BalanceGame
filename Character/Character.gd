@@ -30,16 +30,16 @@ var tension:float = 0 setget _set_tension
 export(float) var max_tension:float = 0.95
 export(float) var tension_step:float = 0.01
 
-func _set_tension(value:float):
+func _set_tension(value:float) -> void:
 	tension = value
 	spring.rest_length = (value + 1) * spring.length
 	emit_signal("character_tension_changed", value / max_tension)
 
 
-#func _ready():
+#func _ready() -> void:
 #	update_mouse(get_viewport().get_mouse_position())#for some reason, this always gives the same value
 
-func _physics_process(delta):
+func _physics_process(delta) -> void:
 	var torque_to_apply:float = 0
 	if do_torque_input:
 		torque_to_apply +=  mouse_pos.x * sensitivity * delta
@@ -55,27 +55,27 @@ func _physics_process(delta):
 	update_origin()
 
 # Rotates body1 and applies corresponding torque to body2
-func torque_against(body1:RigidBody2D, torque:float, body2:RigidBody2D):
+func torque_against(body1:RigidBody2D, torque:float, body2:RigidBody2D) -> void:
 	var offset:Vector2 = body2.global_position - body1.global_position
 	body1.apply_torque_impulse(torque)
 	body2.apply_impulse(offset + Vector2(1, 0), Vector2(0, -torque/2))
 	body2.apply_impulse(offset + Vector2(-1, 0), Vector2(0, torque/2))
 
 
-func _input(event):
+func _input(event) -> void:
 	if event is InputEventMouseMotion:
 		update_mouse(event.position)
 	if do_compress_input and event.is_action_released("character_compress"):
 		_set_tension(max_tension)
 
-func update_mouse(position:Vector2):
+func update_mouse(position:Vector2) -> void:
 	mouse_pos = (position * 2 / get_viewport_rect().size) - Vector2(1, 1)
 	mouse_pos.x = clamp(mouse_pos.x, -1, 1)
 	mouse_pos.y = clamp(mouse_pos.y, -1, 1)
 	
 	emit_signal("character_torque_changed", mouse_pos.x)
 
-func update_origin():
+func update_origin() -> void:
 	if followed != null:
 		var offset:Vector2
 		offset = followed.global_position - global_position
@@ -84,5 +84,5 @@ func update_origin():
 		position += offset
 
 
-func _on_body_hit_floor(collision_point:Vector2, collision_normal:Vector2):
+func _on_body_hit_floor(collision_point:Vector2, collision_normal:Vector2) -> void:
 	emit_signal("body_hit_floor", collision_point, collision_normal)

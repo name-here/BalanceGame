@@ -4,7 +4,7 @@ extends RigidBody2D
 signal hit_floor(collision_point, collision_normal)
 
 
-func _integrate_forces(state):
+func _integrate_forces(state) -> void:
 	for i in range( state.get_contact_count() ):
 		var collider_object = state.get_contact_collider_object(i)
 		if collider_object.collision_layer & 0b100:

@@ -8,7 +8,7 @@ var color_rect:ColorRect
 
 var viewport:Viewport
 
-func _ready():
+func _ready() -> void:
 	if not Engine.editor_hint:
 		viewport = get_viewport()
 		color_rect = get_node(_color_rect)
@@ -17,7 +17,7 @@ func _ready():
 	#print("run from ready with ", color)
 	_set_color(color)
 
-func _set_color(new_color:Color):
+func _set_color(new_color:Color) -> void:
 	#print("setting ", color)
 	if Engine.editor_hint:
 		get_node(_color_rect).color = new_color
@@ -26,5 +26,5 @@ func _set_color(new_color:Color):
 		color_rect.color = new_color
 	color = new_color
 
-func update_size():
+func update_size() -> void:
 	color_rect.rect_size = viewport.get_visible_rect().size

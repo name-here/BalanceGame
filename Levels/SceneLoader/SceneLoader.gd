@@ -16,24 +16,24 @@ var is_loading := false
 var progress:float
 
 
-func _ready():
+func _ready() -> void:
 	if scenes_folder.ends_with("/"):
 		scenes_folder.erase(scenes_folder.length() - 1, 1)
 	load_scene(starting_scene)
 
-func load_scene(index:int):
+func load_scene(index:int) -> void:
 	loading_scene_index = index
 	if index >= 0 and index < scenes.size():
 		var packed_scene:PackedScene = ResourceLoader.load(scenes_folder+"/"+scenes[index]+"/"+scenes[index]+".tscn")
 		if packed_scene != null:
 			loading_scene = packed_scene.instance()
-			call_deferred("switch_scene")
+			call_deferred("_switch_scene")
 		else:
 			push_error("Error: Could not load scene from specified path: \"%s\"."%scenes[starting_scene])
 	else:
 		push_error("Error: Invalid index %i given for loading scene.  There are only %i scenes."%index%scenes.size())
 
-func load_scene_async(index:int):
+func load_scene_async(index:int) -> void:
 	is_loading = true
 	loading_scene_index = index
 	var request := AsyncLoader.LoadRequest.new(
@@ -42,7 +42,7 @@ func load_scene_async(index:int):
 	AsyncLoader.load(request)
 
 #Switches to loading_scene 
-func switch_scene():
+func _switch_scene() -> void:#must always be called deferred, or probably won't work
 	assert(loading_scene != null)
 	if loading_scene != null:
 		add_child(loading_scene)
@@ -54,20 +54,20 @@ func switch_scene():
 		current_scene_index = loading_scene_index
 		loading_scene = null
 
-func _update_progress(new_progress:float):
+func _update_progress(new_progress:float) -> void:
 	progress = new_progress
 	emit_signal("progress_changed", new_progress)
 
 # This function gets called in the loader thread instead of the main thread,
 # allowing the scene to be instanced without potentially freezing the main thread.
-func _scene_loaded(scene):
+func _scene_loaded(scene) -> void:
 	if scene != null:
 		call_deferred("_update_loading_scene", scene.instance())
 	else:
 		push_error("Error: Could not load scene from specified path \"%s\"."%scenes[loading_scene_index])
 
-func _update_loading_scene(scene_instance):#should only ever be called deferred
+func _update_loading_scene(scene_instance) -> void:#should only ever be called deferred
 	loading_scene = scene_instance
-	#switch_scene()
+	#_switch_scene()
 	#emit_signal("progress_changed", 100.0)#_update_progress is already called with 100% on completion
 	emit_signal("scene_loaded")

@@ -8,10 +8,10 @@ onready var right_bar:ProgressBar = get_node(_right_bar)
 
 export(float, -1, 1) var value:float = 0 setget _set_value
 
-func _ready():
+func _ready() -> void:
 	_set_value(value)
 
-func _set_value(new_value:float):
+func _set_value(new_value:float) -> void:
 	value = new_value
 	if right_bar:
 		left_bar.value = new_value

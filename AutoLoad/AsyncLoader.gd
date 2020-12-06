@@ -29,13 +29,13 @@ var stop_threads:bool setget _set_stop_threads, _get_stop_threads
 onready var stop_mutex:Mutex = Mutex.new()
 
 
-func _ready():
+func _ready() -> void:
 	for i in thread_count:
 		threads.append( Thread.new() )
 		threads[i].start(self, "_loader_thread")
 
 
-func load(request:LoadRequest, high_priority:bool = false):
+func load(request:LoadRequest, high_priority:bool = false) -> void:
 	if ResourceLoader.has_cached(request.path):
 		call_deferred( "_callback_complete", request, ResourceLoader.load(request.path) )
 		return
@@ -48,7 +48,7 @@ func load(request:LoadRequest, high_priority:bool = false):
 	semaphore.post()
 
 
-func _loader_thread(data):
+func _loader_thread(data) -> void:
 	var request:LoadRequest
 	var loader:ResourceInteractiveLoader
 	var err
@@ -80,20 +80,20 @@ func _loader_thread(data):
 				call_deferred("push_error", err)
 				break
 
-func _callback_progress(request:LoadRequest, percent:float):
+func _callback_progress(request:LoadRequest, percent:float) -> void:
 	if request.progress_callback.is_valid():
 		request.progress_callback.call_func(percent)
 
-func _callback_complete(request:LoadRequest, resource):
+func _callback_complete(request:LoadRequest, resource) -> void:
 	call_deferred("_callback_progress", request, 100.0)
 	if request.completion_callback.is_valid():
 		request.completion_callback.call_func(resource)
 
-func _exit_tree():
+func _exit_tree() -> void:
 	_set_stop_threads(true)
 
 
-#func _set_loader_threads(count):#this is almost certainly totally useless
+#func _set_loader_threads(count) -> void:#this is almost certainly totally useless
 #	if count == loader_threads:
 #		return
 #	else:
@@ -112,7 +112,7 @@ func _exit_tree():
 #				threads[i].start(self, "_loader_thread", i)
 #		loader_threads = count
 
-func _set_stop_threads(value):
+func _set_stop_threads(value) -> void:
 	if value==true and stop_threads==false:
 		stop_mutex.lock()
 		stop_threads = true
@@ -122,7 +122,7 @@ func _set_stop_threads(value):
 		for thread in threads:
 			thread.wait_to_finish()
 
-func _get_stop_threads():
+func _get_stop_threads() -> bool:
 	stop_mutex.lock()
 	var value = stop_threads
 	stop_mutex.unlock()

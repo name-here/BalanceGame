@@ -24,7 +24,7 @@ onready var wall:StaticBody2D = get_node(_wall)
 export(float) var wall_width:float
 
 
-func _ready():
+func _ready() -> void:
 	has_scene_loader = get_parent() is SceneLoader
 	if has_scene_loader:
 		scene_loader = get_parent()
@@ -35,22 +35,22 @@ func set_active(value := true) -> void:
 	_on_window_resize()
 	get_viewport().connect("size_changed", self, "_on_window_resize")
 
-func start_next_level():#Move logic in this and _on_next_level_loaded to LevelController
+func start_next_level() -> void:#Move logic in this and _on_next_level_loaded to LevelController
 	if next_level_ready:
 		level_controller.tween.remove_all()
 		Physics2DServer.set_active(true)
-		scene_loader.call_deferred("switch_scene")
+		scene_loader.call_deferred("_switch_scene")
 		#scene_loader.load_scene(1)
 	else:
 		switch_when_ready = true
 
-func _on_next_level_loaded():
+func _on_next_level_loaded() -> void:
 	next_level_ready = true
 	if switch_when_ready:
 		call_deferred("start_next_level")
 
 
-func _on_level_state_changed(new_state:int, last_state:int):
+func _on_level_state_changed(new_state:int, last_state:int) -> void:
 	match new_state:
 		level_controller.states.COMPLETE_1:
 			level_controller.tween.interpolate_property(camera, "global_position:x",
@@ -72,12 +72,12 @@ func _on_level_state_changed(new_state:int, last_state:int):
 				level_controller.tween.interpolate_deferred_callback(self, level_controller.next_level_anim_time, "start_next_level")
 				level_controller.tween.start()
 
-func _on_level_restart(time:float):
+func _on_level_restart(time:float) -> void:
 	level_controller.tween.interpolate_property(camera, "global_position:x",
 		camera.global_position.x, 512, time/2, Tween.TRANS_CUBIC)
 
 
-func _on_window_resize():#TODO: Change some of this to not use global properties!<<<<<<<<<<<<<<<<<<<<<<<<<
+func _on_window_resize() -> void:#TODO: Change some of this to not use global properties!<<<<<<<<<<<<<<<<<<<<<<<<<
 	var new_size:Vector2 = get_viewport_rect().size
 	floor_.scale = Vector2(new_size.x * 2, new_size.y / 2 - 256)
 	floor_.global_position.x = floor_.scale.x / 2 - new_size.x / 2 + 512

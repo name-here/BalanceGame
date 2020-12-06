@@ -1,175 +1,143 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://Levels/Tutorial_02/Tutorial_02.gd" type="Script" id=1]
-[ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Objects/Floor/Floor.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Character/Character.tscn" type="PackedScene" id=6]
-[ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=7]
-[ext_resource path="res://Levels/LevelController/LevelController.tscn" type="PackedScene" id=8]
-[ext_resource path="res://Levels/Tutorial_02/Arrow.png" type="Texture" id=9]
-[ext_resource path="res://Interface/RewindOverlay/RewindOverlay.tscn" type="PackedScene" id=10]
-[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=11]
-[ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=12]
-[ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=13]
-[ext_resource path="res://Materials/ContrastBackground/ContrastBackground.tres" type="Material" id=14]
-[ext_resource path="res://Materials/FrameOverlay/FrameOverlay.shader" type="Shader" id=15]
+[ext_resource path="res://Levels/LevelController/Tween.gd" type="Script" id=2]
+[ext_resource path="res://Levels/Tutorial_02/Polygon.gd" type="Script" id=3]
+[ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=4]
+[ext_resource path="res://Interface/RewindOverlay/RewindOverlay.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Levels/Tutorial_02/Floor.gd" type="Script" id=8]
+[ext_resource path="res://Materials/ContrastBackground/ContrastBackground.tres" type="Material" id=9]
+[ext_resource path="res://Materials/FrameOverlay/FrameOverlay.shader" type="Shader" id=10]
+[ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=11]
+[ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Character/Character.tscn" type="PackedScene" id=14]
 
 [sub_resource type="ShaderMaterial" id=1]
-shader = ExtResource( 12 )
+shader = ExtResource( 4 )
 shader_param/isActive = false
 shader_param/fadeColor = Color( 1, 1, 1, 1 )
 shader_param/baseColor = Color( 0.498039, 0.498039, 0.498039, 1 )
 
 [sub_resource type="ShaderMaterial" id=2]
-shader = ExtResource( 12 )
+shader = ExtResource( 4 )
 shader_param/isActive = true
 shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
 
 [sub_resource type="ShaderMaterial" id=3]
-shader = ExtResource( 15 )
-shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.301961 )
+shader = ExtResource( 10 )
+shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.0862745 )
 
 [node name="Tutorial_02" type="Node2D"]
 script = ExtResource( 1 )
-_level_controller = NodePath("LevelController")
-_goal = NodePath("Geometry/Goal")
-_left_wall = NodePath("Geometry/LeftWall")
-_floor_ = NodePath("Geometry/Floor")
-_fade_in = [ NodePath("Geometry/Arrows"), NodePath("LabelOrigin/Label") ]
-_tension_bar = NodePath("HUD/Frame/Margin/Right/Control/Tension")
-intro_anim_time = 1.0
+_character = NodePath("../Tutorial_02/Character")
+_camera = NodePath("../Tutorial_02/Camera2D")
+_fade_out = [ NodePath("SlopeCenter/Label") ]
+end_position = Vector2( 352, -128 )
+_end_screen = NodePath("../Tutorial_02/HUD/Frame/EndScreen")
+_rewind_overlay = NodePath("../Tutorial_02/HUD/Frame/RewindOverlay")
+_tween = NodePath("../Tutorial_02/Tween")
+_goal = NodePath("../Tutorial_02/Geometry/Goal")
+_left_wall = NodePath("../Tutorial_02/Geometry/LeftWall")
+_floor_ = NodePath("../Tutorial_02/Geometry/Floor")
 
-[node name="BackgroundColor" parent="." instance=ExtResource( 11 )]
-color = Color( 0.129412, 0.129412, 0.129412, 1 )
-
-[node name="LevelController" parent="." instance=ExtResource( 8 )]
-_character = NodePath("../Character")
-_camera = NodePath("../Character/Camera2D")
-_fade_out = [ NodePath("../LabelOrigin/Label") ]
-end_position = Vector2( 2048, 0 )
-_end_screen = NodePath("../HUD/Frame/EndScreen")
-_rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
+[node name="Tween" type="Tween" parent="."]
+script = ExtResource( 2 )
 
 [node name="Geometry" type="Node2D" parent="."]
 
-[node name="LeftWall" parent="Geometry" instance=ExtResource( 5 )]
-position = Vector2( -480, -384 )
-scale = Vector2( 64, 768 )
+[node name="LeftWall" parent="Geometry" instance=ExtResource( 13 )]
+position = Vector2( -496, -384 )
+scale = Vector2( 32, 768 )
 
-[node name="Floor" parent="Geometry" instance=ExtResource( 3 )]
-position = Vector2( 1024, 0 )
-scale = Vector2( 3072, 256 )
+[node name="Floor" type="StaticBody2D" parent="Geometry"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource( 8 )
+_polygon = NodePath("../../../Tutorial_02/Geometry/Floor/Polygon2D")
+_collision_polygon = NodePath("../../../Tutorial_02/Geometry/Floor/CollisionPolygon2D")
+_slope_center = NodePath("../../../Tutorial_02/SlopeCenter")
 
-[node name="Start" parent="Geometry" instance=ExtResource( 2 )]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Geometry/Floor"]
+polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 256 )
+
+[node name="Polygon2D" type="Polygon2D" parent="Geometry/Floor"]
+polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 256 )
+script = ExtResource( 3 )
+
+[node name="Start" parent="Geometry" instance=ExtResource( 12 )]
 material = SubResource( 1 )
+position = Vector2( -352, -32 )
 script = null
 
-[node name="Goal" parent="Geometry" instance=ExtResource( 2 )]
+[node name="Goal" parent="Geometry" instance=ExtResource( 12 )]
 material = SubResource( 2 )
-position = Vector2( 2048, -32 )
+position = Vector2( 352, -160 )
 fade_color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 base_color = Color( 0.564706, 0.807843, 0.643137, 1 )
-_character = NodePath("../../Character")
+_character = NodePath("../../../Tutorial_02/Character")
 
-[node name="Arrows" type="Node2D" parent="Geometry"]
-
-[node name="Arrow1" type="Sprite" parent="Geometry/Arrows"]
-position = Vector2( 440, 0 )
-scale = Vector2( 4, 4 )
-texture = ExtResource( 9 )
-offset = Vector2( 0, 8 )
-
-[node name="Arrow2" type="Sprite" parent="Geometry/Arrows"]
-position = Vector2( 952, 0 )
-scale = Vector2( 4, 4 )
-texture = ExtResource( 9 )
-offset = Vector2( 0, 8 )
-
-[node name="Arrow3" type="Sprite" parent="Geometry/Arrows"]
-position = Vector2( 1464, 0 )
-scale = Vector2( 4, 4 )
-texture = ExtResource( 9 )
-offset = Vector2( 0, 8 )
-
-[node name="Character" parent="." instance=ExtResource( 6 )]
-position = Vector2( 0, -192 )
+[node name="Character" parent="." instance=ExtResource( 14 )]
+position = Vector2( -352, -192 )
+_followed = NodePath("../../Tutorial_02/Character/Body")
+_wheel = NodePath("../../Tutorial_02/Character/Wheel")
+_body = NodePath("../../Tutorial_02/Character/Body")
+_spring = NodePath("../../Tutorial_02/Character/Body/AttachPoint/DampedSpringJoint2D")
+_connector = NodePath("../../Tutorial_02/Character/Body/Connector")
 do_compress_input = false
 
-[node name="Camera2D" type="Camera2D" parent="Character"]
+[node name="SlopeCenter" type="Node2D" parent="."]
 position = Vector2( 0, -64 )
-process_mode = 0
+rotation = -0.339837
 
-[node name="LabelOrigin" type="Node2D" parent="."]
-position = Vector2( 440, 0 )
-
-[node name="Label" type="Label" parent="LabelOrigin"]
-material = ExtResource( 14 )
-margin_left = -134.0
-margin_top = -64.0
-margin_right = 134.0
+[node name="Label" type="Label" parent="SlopeCenter"]
+material = ExtResource( 9 )
+margin_left = -138.0
+margin_top = -58.0
+margin_right = 138.0
+margin_bottom = 6.0
 grow_horizontal = 2
-theme = ExtResource( 13 )
-text = "this way"
+theme = ExtResource( 11 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "up here..."
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="LabelOrigin/Label"]
-use_parent_material = true
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-text = " . . ."
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 0, -256 )
 
-[node name="HUD" parent="." instance=ExtResource( 4 )]
+[node name="HUD" parent="." instance=ExtResource( 7 )]
+
+[node name="Torque" parent="HUD/Frame/Margin/Bottom" index="0"]
+_left_bar = NodePath("../../../../../../Tutorial_02/HUD/Frame/Margin/Bottom/Torque/Left/Left")
+_right_bar = NodePath("../../../../../../Tutorial_02/HUD/Frame/Margin/Bottom/Torque/Right/Right")
 
 [node name="Right" parent="HUD/Frame/Margin" index="1"]
 visible = false
 
-[node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 10 )]
+[node name="Tension" parent="HUD/Frame/Margin/Right/Control" index="0"]
+_left_bar = NodePath("../../../../../../../Tutorial_02/HUD/Frame/Margin/Right/Control/Tension/Left/Left")
+_right_bar = NodePath("../../../../../../../Tutorial_02/HUD/Frame/Margin/Right/Control/Tension/Right/Right")
+
+[node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 5 )]
 visible = false
 material = SubResource( 3 )
 color = Color( 0.635294, 0.827451, 0.87451, 0 )
 
-[node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
+[node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 6 )]
 visible = false
 alpha = 0.0
-
-[node name="MarginContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="0"]
-margin_bottom = 276.0
-
-[node name="CompletedText" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="0"]
-visible = false
-
-[node name="VBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="1"]
-visible = true
-
-[node name="HBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="1"]
-margin_top = 284.0
-margin_bottom = 444.0
-
-[node name="Replay" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 1024.0
-
-[node name="Button" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer/Replay" index="0"]
-margin_right = 1016.0
-
-[node name="Continue" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="1"]
-visible = false
-[connection signal="on_restart" from="LevelController" to="." method="_on_level_on_restart"]
-[connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
-[connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
-[connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
+_background = NodePath("../../../../Tutorial_02/HUD/Frame/EndScreen/Background")
+[connection signal="on_restart" from="." to="." method="_on_level_restart"]
+[connection signal="state_changed" from="." to="." method="_on_level_state_changed"]
+[connection signal="polygon_changed" from="Geometry/Floor/Polygon2D" to="Geometry/Floor" method="_on_polygon_changed"]
+[connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
+[connection signal="body_hit_floor" from="Character" to="." method="_on_character_hit_floor"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
-[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="go_to_next_level"]
-[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart_game"]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart" binds= [ 2.0 ]]
 
 [editable path="HUD"]
-
-[editable path="HUD/Frame/EndScreen"]

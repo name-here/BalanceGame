@@ -64,7 +64,8 @@ var transition_state_buffer := Array()
 # "virtual" functions that can be overridden by classes that extend LevelState
 # to track more properties of the level state (additional objects' positions, etc.)
 func _initialize_history_buffer(length:int) -> Array:
-	var body_positions := PoolVector2Array()#These lines work around the commented-out code below not working
+	# These lines work around the commented-out code below not working
+	var body_positions := PoolVector2Array()#Replace Body_positions with distance from wheel to body to avoid things not lining up during interpolation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	body_positions.resize(length)
 	var body_rotations := PoolRealArray()
 	body_rotations.resize(length)
@@ -87,19 +88,19 @@ func _initialize_history_buffer(length:int) -> Array:
 		#	buffer_array[buffer_index][tracker_index].resize(length)
 		#	print(buffer_array[buffer_index][tracker_index].size(), " should be ", length)
 
-func _write_state(buffer:Array, index:int):
+func _write_state(buffer:Array, index:int) -> void:
 	buffer[0][index] = character.body.global_position
 	buffer[1][index] = character.body.global_rotation
 	buffer[2][index] = character.wheel.global_position
 	buffer[3][index] = character.wheel.global_rotation
 
-func _read_state(buffer:Array, index:int):
+func _read_state(buffer:Array, index:int) -> void:
 	character.body.global_position = buffer[0][index]
 	character.body.global_rotation = buffer[1][index]
 	character.wheel.global_position = buffer[2][index]
 	character.wheel.global_rotation = buffer[3][index]
 
-func _interpolate_state(buffer_1:Array, index_1:int, buffer_2:Array, index_2:int, weight:float):
+func _interpolate_state(buffer_1:Array, index_1:int, buffer_2:Array, index_2:int, weight:float) -> void:
 	character.body.global_position = buffer_1[0][index_1] + \
 		(buffer_2[0][index_2] - buffer_1[0][index_1]) * weight
 	character.body.global_rotation = buffer_1[1][index_1] + \
@@ -110,12 +111,12 @@ func _interpolate_state(buffer_1:Array, index_1:int, buffer_2:Array, index_2:int
 		(buffer_2[3][index_2] - buffer_1[3][index_1]) * weight
 	
 
-func _copy_state(from_buffer:Array, from_index:int, to_buffer:Array, to_index:int):
+func _copy_state(from_buffer:Array, from_index:int, to_buffer:Array, to_index:int) -> void:
 	for i in to_buffer.size():
 		to_buffer[i][to_index] = from_buffer[i][from_index]
 
 
-func _ready():
+func _ready() -> void:
 	for time in completion_anim_times:
 		assert(time > 0)
 	
@@ -133,7 +134,7 @@ func init_level_state() -> void:
 	for i in history_buffers.size():
 		_write_state(history_buffers[i], 0)
 
-func _process(delta):
+func _process(delta) -> void:
 	match state:
 		states.PLAYING:
 			# The following code does (should do) the following:  (needed for rewind effect)
@@ -198,7 +199,7 @@ func _process(delta):
 		#	print("stage 2, ", character.body.global_position, ", ", character.wheel.global_position)
 
 
-func next_complete_anim() -> void:
+func next_complete_anim() -> int:
 	if state < states.COMPLETE_1:
 		set_state(states.COMPLETE_1)
 	elif state < states.size() - 1:
@@ -242,6 +243,8 @@ func next_complete_anim() -> void:
 			tween.start()
 		states.COMPLETE_3:
 			end_screen.active = true
+	
+	return state
 
 
 func play() -> void:
@@ -256,7 +259,7 @@ func stop() -> void:
 	set_physics(false)
 	set_state(states.INACTIVE)
 
-func restart(time:float = 1, override:bool = false):
+func restart(time:float = 1, override:bool = false) -> void:
 	if time <= 0:
 		assert(time > 0)
 		time = 1.0
@@ -292,7 +295,7 @@ func restart(time:float = 1, override:bool = false):
 				tween.interpolate_deferred_callback(self, time/2, "restart", time/2, true)
 				tween.start()
 
-func go_to_next_level():
+func go_to_next_level() -> void:
 	end_screen.active = false
 	set_state(states.NEXT_LEVEL_TRANSITION)
 	
@@ -313,15 +316,15 @@ func go_to_next_level():
 	tween.start()
 
 
-func set_state(new_state:int):
+func set_state(new_state:int) -> void:
 	call_deferred("emit_signal", "state_changed", new_state, state)
 	state = new_state
 
-func set_physics(value:bool):
+func set_physics(value:bool) -> void:
 	Physics2DServer.set_active(value)
 	character.do_torque_input = value
 
-func set_active(value := true):
+func set_active(value := true) -> void:
 	if value:
 		camera.make_current()
 		character.update_mouse(get_viewport().get_mouse_position())
@@ -330,11 +333,11 @@ func set_active(value := true):
 		stop()
 
 
-func interpolate_level_states(weight:float):
+func interpolate_level_states(weight:float) -> void:
 	_interpolate_state(transition_state_buffer, 0,
 		transition_state_buffer, 1, weight)
 
-func set_fade_out_alpha(alpha:float):
+func set_fade_out_alpha(alpha:float) -> void:
 	for element in fade_out:
 		element.modulate.a = alpha
 
@@ -344,16 +347,16 @@ func set_fade_out_alpha(alpha:float):
 #	Engine.time_scale = 1
 
 
-func _on_goal_entered():
+func _on_goal_entered() -> void:
 	if state == states.PLAYING:
 		call_deferred("next_complete_anim")
 
-func _on_character_hit_floor(collision_position:Vector2, collision_normal:Vector2):
-	#emit particles or whatever
+func _on_character_hit_floor(collision_position:Vector2, collision_normal:Vector2) -> void:
+	#TODO: emit particles and play sound, or whatever<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	restart(1)
 
 
-func _input(event):
+func _input(event) -> void:
 	if event.is_action_pressed("reset_level"):
 		#print(states.keys()[state])
 		match state:
