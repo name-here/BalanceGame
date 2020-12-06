@@ -1,14 +1,14 @@
 shader_type canvas_item;
 
 
-uniform vec4 color;
+uniform vec4 color : hint_color;
 
 //uniform sampler2D buffer0;
 //uniform sampler2D buffer1;
 //uniform sampler2D buffer2;
 //uniform sampler2D buffer3;
 
-uniform sampler2D testTexture;
+//uniform sampler2D testTexture;
 
 
 void fragment(){
