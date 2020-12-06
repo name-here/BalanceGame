@@ -39,7 +39,6 @@ func _ready():
 
 
 func load(request:LoadRequest, high_priority:bool = false):
-	print(request.path)
 	if ResourceLoader.has_cached(request.path):
 		call_deferred( "_callback_complete", request, ResourceLoader.load(request.path) )
 		return
