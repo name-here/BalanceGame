@@ -19,9 +19,6 @@ const thread_count = 1
 var request_queue:Array
 onready var request_queue_mutex:Mutex = Mutex.new()
 
-var callback_queue:Array
-onready var callback_queue_mutex:Mutex = Mutex.new()
-
 var threads:Array
 onready var semaphore:Semaphore = Semaphore.new()
 
