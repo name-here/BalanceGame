@@ -90,25 +90,6 @@ func _exit_tree() -> void:
 	_set_stop_threads(true)
 
 
-#func _set_loader_threads(count) -> void:#this is almost certainly totally useless
-#	if count == loader_threads:
-#		return
-#	else:
-#		if count < loader_threads:
-#			stop_mutex.lock()
-#			for i in range(loader_threads, count-1):
-#				stop_thread[i] = true
-#			stop_mutex.unlock()
-#			for i in threads:
-#				semaphore.post()#this is stupid and won't always stop all of them.
-#			for i in range(count, loader_threads-1):
-#				threads[i].wait_to_finish()
-#		else:
-#			for i in range(count, loader_threads-1):
-#				threads.append(Thread.new())
-#				threads[i].start(self, "_loader_thread", i)
-#		loader_threads = count
-
 func _set_stop_threads(value) -> void:
 	if value==true and stop_threads==false:
 		stop_mutex.lock()
