@@ -3,35 +3,58 @@ tool
 extends StaticBody2D
 
 
-export(NodePath) var _polygon:NodePath
-onready var polygon:Polygon2D = get_node(_polygon)
+export(PoolVector2Array) var polygon:PoolVector2Array setget set_polygon
+
+export(NodePath) var _polygon2d:NodePath
+onready var polygon2d:Polygon2D = get_node(_polygon2d)
 export(NodePath) var _collision_polygon:NodePath
 onready var collision_polygon:CollisionPolygon2D = get_node(_collision_polygon)
 
-export(NodePath) var _slope_center:NodePath
-onready var slope_center:Node2D = get_node(_slope_center)
+export(NodePath) var _ramp_center:NodePath
+onready var ramp_center:Node2D = get_node(_ramp_center)
 
 
 func _ready() -> void:
-	update_polygon()
+	_update_polygon()
 
-func set_size(width, height) -> void:
-	polygon.polygon[0] = Vector2(-width / 2, height)
-	polygon.polygon[1].x = -width / 2
-	polygon.polygon[polygon.polygon.size()-2].x = width / 2
-	polygon.polygon[polygon.polygon.size()-1] = Vector2(width / 2, height)
-	update_polygon()
+func set_size(width:float, height:float) -> void:
+	polygon[0] = Vector2(-width / 2, height)
+	polygon[1].x = -width / 2
+	polygon[polygon.size()-2].x = width / 2
+	polygon[polygon.size()-1] = Vector2(width / 2, height)
+	_update_polygon()
 
-func update_polygon() -> void:
-	collision_polygon.polygon = polygon.polygon
-	_set_slope_center()
+func get_ramp_start_height() -> float:
+	return polygon[2].y
 
-func _set_slope_center() -> void:
-	var slope_points := [polygon.polygon[2], polygon.polygon[3]]
-	slope_center.global_position = polygon.global_position + (slope_points[0] + slope_points[1]) / 2
-	slope_center.global_rotation = polygon.global_rotation + \
-		asin( (slope_points[1].y - slope_points[0].y) / (slope_points[1].x - slope_points[0].x) )
+func set_ramp_start_height(height:float) -> void:
+	print(height)
+	polygon[1].y = height
+	polygon[2].y = height
+	_update_polygon()
 
+func get_ramp_end_height() -> float:
+	return polygon[3].y
 
-func _on_polygon_changed(poylgon):
-	_set_slope_center()
+func set_ramp_end_height(height:float) -> void:
+	polygon[3].y = height
+	polygon[4].y = height
+	_update_polygon()
+
+func set_polygon(new_polygon:PoolVector2Array) -> void:
+	polygon = new_polygon
+	if polygon2d and collision_polygon:
+		_update_polygon()
+	else:
+		call_deferred("update_polygon")
+
+func _update_polygon() -> void:
+	polygon2d.polygon = polygon
+	collision_polygon.polygon = polygon
+	_update_ramp_center()
+
+func _update_ramp_center() -> void:
+	var ramp_points := [polygon[2], polygon[3]]
+	ramp_center.global_position = global_position + (ramp_points[0] + ramp_points[1]) / 2
+	ramp_center.global_rotation = global_rotation + \
+		asin( (ramp_points[1].y - ramp_points[0].y) / (ramp_points[1].x - ramp_points[0].x) )

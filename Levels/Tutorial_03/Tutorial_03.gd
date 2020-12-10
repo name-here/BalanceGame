@@ -22,6 +22,7 @@ onready var tension_bar:Control = get_node(_tension_bar)
 export(float) var intro_anim_time:float = 2
 
 
+
 func _ready() -> void:
 	level_controller.stop()
 	
@@ -46,11 +47,11 @@ func set_active(value := true) -> void:
 			element.modulate.a = 0
 			level_controller.tween.interpolate_property(element, "modulate:a",
 				0, 1, intro_anim_time)
-		left_wall.global_position.x -= 64
+		left_wall.global_position.x -= 64#Change to use wall's transform?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		level_controller.tween.interpolate_property(left_wall, "global_position:x",
 			left_wall.global_position.x, left_wall.global_position.x + 64,
 			intro_anim_time, Tween.TRANS_CUBIC, Tween.EASE_OUT)
-		level_controller.tween.interpolate_deferred_callback(self, intro_anim_time, "_on_intro_anim_done")
+		level_controller.tween.interpolate_callback(self, intro_anim_time, "_on_intro_anim_done")
 		level_controller.tween.start()
 
 func _on_intro_anim_done() -> void:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://Levels/Tutorial_02/Tutorial_02.gd" type="Script" id=1]
 [ext_resource path="res://Levels/LevelController/Tween.gd" type="Script" id=2]
@@ -14,6 +14,7 @@
 [ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=12]
 [ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Character/Character.tscn" type="PackedScene" id=14]
+[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=15]
 
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 4 )
@@ -35,17 +36,21 @@ shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.0862745 )
 script = ExtResource( 1 )
 _character = NodePath("../Tutorial_02/Character")
 _camera = NodePath("../Tutorial_02/Camera2D")
-_fade_out = [ NodePath("SlopeCenter/Label") ]
+_fade_out = [ NodePath("RampCenter/Label") ]
 end_position = Vector2( 352, -128 )
 _end_screen = NodePath("../Tutorial_02/HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../Tutorial_02/HUD/Frame/RewindOverlay")
 _tween = NodePath("../Tutorial_02/Tween")
 _goal = NodePath("../Tutorial_02/Geometry/Goal")
+_start = NodePath("Geometry/Start")
 _left_wall = NodePath("../Tutorial_02/Geometry/LeftWall")
 _floor_ = NodePath("../Tutorial_02/Geometry/Floor")
 
 [node name="Tween" type="Tween" parent="."]
 script = ExtResource( 2 )
+
+[node name="BackgroundColor" parent="." instance=ExtResource( 15 )]
+color = Color( 0.129412, 0.129412, 0.129412, 1 )
 
 [node name="Geometry" type="Node2D" parent="."]
 
@@ -57,9 +62,10 @@ scale = Vector2( 32, 768 )
 collision_layer = 4
 collision_mask = 3
 script = ExtResource( 8 )
-_polygon = NodePath("../../../Tutorial_02/Geometry/Floor/Polygon2D")
-_collision_polygon = NodePath("../../../Tutorial_02/Geometry/Floor/CollisionPolygon2D")
-_slope_center = NodePath("../../../Tutorial_02/SlopeCenter")
+polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 256 )
+_polygon2d = NodePath("Polygon2D")
+_collision_polygon = NodePath("CollisionPolygon2D")
+_ramp_center = NodePath("../../RampCenter")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Geometry/Floor"]
 polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 256 )
@@ -89,11 +95,11 @@ _spring = NodePath("../../Tutorial_02/Character/Body/AttachPoint/DampedSpringJoi
 _connector = NodePath("../../Tutorial_02/Character/Body/Connector")
 do_compress_input = false
 
-[node name="SlopeCenter" type="Node2D" parent="."]
+[node name="RampCenter" type="Node2D" parent="."]
 position = Vector2( 0, -64 )
 rotation = -0.339837
 
-[node name="Label" type="Label" parent="SlopeCenter"]
+[node name="Label" type="Label" parent="RampCenter"]
 material = ExtResource( 9 )
 margin_left = -138.0
 margin_top = -58.0
@@ -138,6 +144,7 @@ _background = NodePath("../../../../Tutorial_02/HUD/Frame/EndScreen/Background")
 [connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="." method="_on_character_hit_floor"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
+[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="." method="transition_to_next_level"]
 [connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart" binds= [ 2.0 ]]
 
 [editable path="HUD"]
