@@ -3,6 +3,7 @@ class_name EndScreen extends Control
 
 signal restart_pressed
 signal continue_pressed
+signal save_replay_pressed
 
 export(bool) var active := false setget set_active
 export(float) var alpha:float setget set_alpha
@@ -54,8 +55,11 @@ func set_active(value) -> void:
 	active = value
 
 
-func _restart_pressed() -> void:
+func _on_restart_pressed() -> void:
 	emit_signal("restart_pressed")
 
-func _continue_pressed() -> void:
+func _on_continue_pressed() -> void:
 	emit_signal("continue_pressed")
+
+func _on_save_replay_pressed() -> void:
+	emit_signal("save_replay_pressed")

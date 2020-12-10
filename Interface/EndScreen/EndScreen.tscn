@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Themes/Fonts/PixelX16_128.tres" type="DynamicFont" id=1]
-[ext_resource path="res://Themes/Fonts/PixelX16_96.tres" type="DynamicFont" id=2]
+[ext_resource path="res://Themes/Fonts/PixelX16/PixelX16_128.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Themes/Fonts/PixelX16/PixelX16_96.tres" type="DynamicFont" id=2]
 [ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=3]
 [ext_resource path="res://Interface/EndScreen/EndScreen.gd" type="Script" id=4]
 
@@ -70,7 +70,7 @@ __meta__ = {
 visible = false
 margin_left = 32.0
 margin_right = 992.0
-margin_bottom = 276.0
+margin_bottom = 2882.0
 
 [node name="ComeBackLater1" type="Label" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
 margin_right = 960.0
@@ -91,9 +91,9 @@ custom_constants/margin_left = 0
 custom_constants/margin_bottom = 0
 
 [node name="ComeBackLater2" type="Label" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/MarginContainer"]
-margin_top = 8.0
+margin_top = 16.0
 margin_right = 40.0
-margin_bottom = 2732.0
+margin_bottom = 2740.0
 theme = ExtResource( 3 )
 custom_colors/font_color = Color( 0.882353, 0.807843, 1, 1 )
 text = "Come back later, and I might just have more."
@@ -149,13 +149,14 @@ custom_colors/font_color_disabled = Color( 0.517647, 0.839216, 0.623529, 1 )
 custom_colors/font_color = Color( 0.517647, 0.839216, 0.623529, 1 )
 custom_colors/font_color_hover = Color( 0.517647, 0.839216, 0.623529, 1 )
 custom_colors/font_color_pressed = Color( 0.517647, 0.839216, 0.623529, 1 )
+custom_constants/hseparation = 0
 text = "[continue]"
 
 [node name="Save Replay" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
 visible = false
-margin_top = 450.0
+margin_top = 438.0
 margin_right = 1024.0
-margin_bottom = 546.0
+margin_bottom = 534.0
 custom_constants/margin_right = 0
 custom_constants/margin_top = 32
 custom_constants/margin_left = 0
@@ -169,5 +170,6 @@ margin_bottom = 96.0
 size_flags_horizontal = 4
 theme = ExtResource( 3 )
 text = "[Save replay]"
-[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Replay/Button" to="." method="_restart_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Continue/Button" to="." method="_continue_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Replay/Button" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Continue/Button" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Save Replay/Button" to="." method="_on_save_replay_pressed"]
