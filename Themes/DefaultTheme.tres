@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=7 format=2]
 
-[ext_resource path="res://Themes/Fonts/PixelX16_64.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Themes/Fonts/PixelX16/PixelX16_64.tres" type="DynamicFont" id=1]
 
 [sub_resource type="StyleBoxEmpty" id=1]
 
