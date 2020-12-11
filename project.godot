@@ -53,7 +53,8 @@ _global_script_class_icons={
 config/name="Balance Game"
 run/main_scene="res://Levels/SceneLoader/SceneLoader.tscn"
 config/icon="res://Icon/Icon_256.png"
-config/windows_native_icon="res://Icon/Icon.ico"
+config/macos_native_icon="res://Icon/Exported/balance.icns"
+config/windows_native_icon="res://Icon/Exported/balance.ico"
 
 [autoload]
 
