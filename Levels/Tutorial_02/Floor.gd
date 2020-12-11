@@ -45,7 +45,7 @@ func set_polygon(new_polygon:PoolVector2Array) -> void:
 	if polygon2d and collision_polygon:
 		_update_polygon()
 	else:
-		call_deferred("update_polygon")
+		call_deferred("_update_polygon")
 
 func _update_polygon() -> void:
 	polygon2d.polygon = polygon
