@@ -28,7 +28,6 @@ func get_ramp_start_height() -> float:
 	return polygon[2].y
 
 func set_ramp_start_height(height:float) -> void:
-	print(height)
 	polygon[1].y = height
 	polygon[2].y = height
 	_update_polygon()
