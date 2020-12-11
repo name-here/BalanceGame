@@ -114,7 +114,7 @@ color = Color( 0.635294, 0.827451, 0.87451, 0 )
 [node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 7 )]
 visible = false
 alpha = 0.0
-[connection signal="on_restart" from="." to="." method="_on_level_restart"]
+[connection signal="restarting" from="." to="." method="_on_level_restarting"]
 [connection signal="state_changed" from="." to="." method="_on_level_state_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="." method="_on_character_hit_floor"]

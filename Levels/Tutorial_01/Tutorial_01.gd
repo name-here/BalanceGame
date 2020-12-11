@@ -34,7 +34,7 @@ func _on_level_state_changed(new_state:int, last_state:int) -> void:#TODO: Chang
 			#		level_controller.next_level_anim_time, Tween.TRANS_CUBIC, Tween.EASE_IN)
 			#tween.start()Don't need to start the tween, since it gets started later (it shouldn't matter, though)
 
-func _on_level_restart(time:float) -> void:
+func _on_level_restarting(time:float) -> void:
 	tween.interpolate_property(camera, "global_position:x",
 		camera.global_position.x, 512, time/2, Tween.TRANS_CUBIC)
 

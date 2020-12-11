@@ -138,7 +138,7 @@ color = Color( 0.635294, 0.827451, 0.87451, 0 )
 visible = false
 alpha = 0.0
 _background = NodePath("../../../../Tutorial_02/HUD/Frame/EndScreen/Background")
-[connection signal="on_restart" from="." to="." method="_on_level_restart"]
+[connection signal="restarting" from="." to="." method="_on_level_restarting"]
 [connection signal="state_changed" from="." to="." method="_on_level_state_changed"]
 [connection signal="polygon_changed" from="Geometry/Floor/Polygon2D" to="Geometry/Floor" method="_on_polygon_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]

@@ -14,7 +14,7 @@
 [ext_resource path="res://Objects/Floor/Floor.tscn" type="PackedScene" id=12]
 [ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Materials/FrameOverlay/FrameOverlay.shader" type="Shader" id=14]
-[ext_resource path="res://Levels/LevelController/LevelController.tscn" type="PackedScene" id=15]
+[ext_resource path="res://Levels/LevelController/Tween.gd" type="Script" id=16]
 
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 4 )
@@ -32,26 +32,27 @@ shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
 shader = ExtResource( 14 )
 shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.301961 )
 
-[node name="Tutorial_02" type="Node2D"]
+[node name="Tutorial_03" type="Node2D"]
 script = ExtResource( 10 )
-_level_controller = NodePath("LevelController")
-_goal = NodePath("Geometry/Goal")
-_left_wall = NodePath("Geometry/LeftWall")
-_floor_ = NodePath("Geometry/Floor")
+_character = NodePath("Character")
+_camera = NodePath("Character/Camera2D")
+_fade_out = [ NodePath("LabelOrigin") ]
+end_position = Vector2( 2048, 0 )
+_end_screen = NodePath("HUD/Frame/EndScreen")
+_rewind_overlay = NodePath("HUD/Frame/RewindOverlay")
+_tween = NodePath("Tween")
+_goal = NodePath("../Tutorial_03/Geometry/Goal")
+_left_wall = NodePath("../Tutorial_03/Geometry/LeftWall")
+_floor_ = NodePath("../Tutorial_03/Geometry/Floor")
 _fade_in = [ NodePath("Geometry/Arrows"), NodePath("LabelOrigin/Label") ]
-_tension_bar = NodePath("HUD/Frame/Margin/Right/Control/Tension")
-intro_anim_time = 1.0
+_tension_bar = NodePath("../Tutorial_03/HUD/Frame/Margin/Right/Control/Tension")
+
+[node name="Tween" type="Tween" parent="."]
+script = ExtResource( 16 )
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 13 )]
 color = Color( 0.129412, 0.129412, 0.129412, 1 )
-
-[node name="LevelController" parent="." instance=ExtResource( 15 )]
-_character = NodePath("../Character")
-_camera = NodePath("../Character/Camera2D")
-_fade_out = [ NodePath("../LabelOrigin/Label") ]
-end_position = Vector2( 2048, 0 )
-_end_screen = NodePath("../HUD/Frame/EndScreen")
-_rewind_overlay = NodePath("../HUD/Frame/RewindOverlay")
+_color_rect = NodePath("../../Tutorial_03/BackgroundColor/ColorRect")
 
 [node name="Geometry" type="Node2D" parent="."]
 
@@ -72,7 +73,7 @@ material = SubResource( 2 )
 position = Vector2( 2048, -32 )
 fade_color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 base_color = Color( 0.564706, 0.807843, 0.643137, 1 )
-_character = NodePath("../../Character")
+_character = NodePath("../../../Tutorial_03/Character")
 
 [node name="Arrows" type="Node2D" parent="Geometry"]
 
@@ -96,6 +97,11 @@ offset = Vector2( 0, 8 )
 
 [node name="Character" parent="." instance=ExtResource( 1 )]
 position = Vector2( 0, -192 )
+_followed = NodePath("../../Tutorial_03/Character/Body")
+_wheel = NodePath("../../Tutorial_03/Character/Wheel")
+_body = NodePath("../../Tutorial_03/Character/Body")
+_spring = NodePath("../../Tutorial_03/Character/Body/AttachPoint/DampedSpringJoint2D")
+_connector = NodePath("../../Tutorial_03/Character/Body/Connector")
 do_compress_input = false
 
 [node name="Camera2D" type="Camera2D" parent="Character"]
@@ -129,8 +135,16 @@ __meta__ = {
 
 [node name="HUD" parent="." instance=ExtResource( 5 )]
 
+[node name="Torque" parent="HUD/Frame/Margin/Bottom" index="0"]
+_left_bar = NodePath("../../../../../../Tutorial_03/HUD/Frame/Margin/Bottom/Torque/Left/Left")
+_right_bar = NodePath("../../../../../../Tutorial_03/HUD/Frame/Margin/Bottom/Torque/Right/Right")
+
 [node name="Right" parent="HUD/Frame/Margin" index="1"]
 visible = false
+
+[node name="Tension" parent="HUD/Frame/Margin/Right/Control" index="0"]
+_left_bar = NodePath("../../../../../../../Tutorial_03/HUD/Frame/Margin/Right/Control/Tension/Left/Left")
+_right_bar = NodePath("../../../../../../../Tutorial_03/HUD/Frame/Margin/Right/Control/Tension/Right/Right")
 
 [node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 7 )]
 visible = false
@@ -140,39 +154,11 @@ color = Color( 0.635294, 0.827451, 0.87451, 0 )
 [node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 6 )]
 visible = false
 alpha = 0.0
-
-[node name="VBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer" index="0"]
-margin_bottom = 3114.0
-
-[node name="MarginContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="0"]
-margin_bottom = 276.0
-
-[node name="CompletedText" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="0"]
-visible = false
-
-[node name="VBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="1"]
-visible = true
-
-[node name="HBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="1"]
-margin_top = 284.0
-margin_bottom = 444.0
-
-[node name="Replay" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 1024.0
-
-[node name="Button" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer/Replay" index="0"]
-margin_right = 1016.0
-
-[node name="Continue" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="1"]
-visible = false
-[connection signal="on_restart" from="LevelController" to="." method="_on_level_on_restart"]
-[connection signal="state_changed" from="LevelController" to="." method="_on_level_state_changed"]
-[connection signal="goal_entered" from="Geometry/Goal" to="LevelController" method="_on_goal_entered"]
-[connection signal="body_hit_floor" from="Character" to="LevelController" method="_on_character_hit_floor"]
+_background = NodePath("../../../../Tutorial_03/HUD/Frame/EndScreen/Background")
+[connection signal="restarting" from="." to="." method="_on_level_restarting"]
+[connection signal="state_changed" from="." to="." method="_on_level_state_changed"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
-[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="LevelController" method="go_to_next_level"]
-[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart_game"]
+[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="." method="transition_to_next_level"]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart" binds= [ 2.0 ]]
 
 [editable path="HUD"]
-
-[editable path="HUD/Frame/EndScreen"]

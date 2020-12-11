@@ -18,7 +18,7 @@ func set_active(value := true) -> void:
 	self.end_position.x = goal.global_position.x
 	.set_active(value)
 	var window_size:Vector2 = _on_window_resize()
-	stop()
+	pause()
 	
 	floor_.ramp_center.modulate.a = 0
 	var ramp_height = floor_.get_ramp_end_height()
@@ -80,7 +80,7 @@ func _on_level_state_changed(new_state:int, last_state:int) -> void:
 				start.global_position.x, camera.global_position.x - get_viewport_rect().size.x / 2 - 128,
 				next_level_anim_time, Tween.TRANS_CUBIC)
 
-func _on_level_restart(time:float) -> void:
+func _on_level_restarting(time:float) -> void:
 	tween.interpolate_property(camera, "global_position",
 		camera.global_position, Vector2(0, -256),
 		completion_anim_times[0], Tween.TRANS_CUBIC, Tween.EASE_OUT)

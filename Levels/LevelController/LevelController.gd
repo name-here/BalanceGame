@@ -4,7 +4,7 @@ class_name LevelController extends Node2D
 # warning-ignore:unused_signal
 #(it actually *is* used, but emitted with call_deferred)
 signal state_changed(changed_to, changed_from)
-signal on_restart(time)
+signal restarting(time)
 
 enum states{#This and the rewind history shouldn't both get called "state"
 	INACTIVE,
@@ -278,7 +278,7 @@ func restart(time:float = 1, override:bool = false) -> void:
 		time = 1.0
 	if override or state == states.PLAYING:
 		set_physics(false)
-		emit_signal("on_restart", time)
+		emit_signal("restarting", time)
 		character.body.angular_velocity = 0
 		character.body.linear_velocity = Vector2(0, 0)
 		character.wheel.angular_velocity = 0
