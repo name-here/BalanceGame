@@ -19,7 +19,7 @@
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 4 )
 shader_param/isActive = false
-shader_param/fadeColor = Color( 1, 1, 1, 1 )
+shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 shader_param/baseColor = Color( 0.498039, 0.498039, 0.498039, 1 )
 
 [sub_resource type="ShaderMaterial" id=2]
@@ -41,12 +41,13 @@ end_position = Vector2( 352, -128 )
 _end_screen = NodePath("../Tutorial_02/HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../Tutorial_02/HUD/Frame/RewindOverlay")
 _tween = NodePath("../Tutorial_02/Tween")
-_goal = NodePath("../Tutorial_02/Geometry/Goal")
 _start = NodePath("Geometry/Start")
-_left_wall = NodePath("../Tutorial_02/Geometry/LeftWall")
+_goal = NodePath("../Tutorial_02/Geometry/Goal")
+_wall = NodePath("Geometry/Wall")
 _floor_ = NodePath("../Tutorial_02/Geometry/Floor")
 
 [node name="Tween" type="Tween" parent="."]
+playback_process_mode = 0
 script = ExtResource( 2 )
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 15 )]
@@ -54,9 +55,9 @@ color = Color( 0.129412, 0.129412, 0.129412, 1 )
 
 [node name="Geometry" type="Node2D" parent="."]
 
-[node name="LeftWall" parent="Geometry" instance=ExtResource( 13 )]
-position = Vector2( -496, -384 )
-scale = Vector2( 32, 768 )
+[node name="Wall" parent="Geometry" instance=ExtResource( 13 )]
+position = Vector2( -504, -384 )
+scale = Vector2( 16, 768 )
 
 [node name="Floor" type="StaticBody2D" parent="Geometry"]
 collision_layer = 4
@@ -77,13 +78,14 @@ script = ExtResource( 3 )
 [node name="Start" parent="Geometry" instance=ExtResource( 12 )]
 material = SubResource( 1 )
 position = Vector2( -352, -32 )
-script = null
+is_active = false
+emit_particles = false
+base_color = Color( 0.498039, 0.498039, 0.498039, 1 )
 
 [node name="Goal" parent="Geometry" instance=ExtResource( 12 )]
 material = SubResource( 2 )
 position = Vector2( 352, -160 )
-fade_color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
-base_color = Color( 0.564706, 0.807843, 0.643137, 1 )
+particle_color = Color( 0.862745, 0.937255, 0.886275, 1 )
 _character = NodePath("../../../Tutorial_02/Character")
 
 [node name="Character" parent="." instance=ExtResource( 14 )]

@@ -8,7 +8,7 @@ extends LevelController
 #var has_scene_loader := false
 
 export(NodePath) var _goal:NodePath
-onready var goal:Sprite = get_node(_goal)
+onready var goal:Goal = get_node(_goal)
 export(NodePath) var _left_wall:NodePath
 onready var left_wall:StaticBody2D = get_node(_left_wall)
 export(NodePath) var _floor_:NodePath

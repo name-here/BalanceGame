@@ -16,7 +16,8 @@ class LoadRequest:
 
 # Changing this during runtime could break request_queue
 # (single-thread mode doesn't use the mutexes,
-# and thread(s) will still be running)
+# and thread(s) will still be running).
+# Could add custom setter if this is ever needed
 var use_threads := true
 
 const thread_count = 1
@@ -36,6 +37,7 @@ onready var stop_mutex:Mutex = Mutex.new()
 
 
 func _ready() -> void:
+	set_process(false)
 	if OS.can_use_threads():
 		for i in thread_count:
 			threads.append( Thread.new() )
@@ -62,6 +64,7 @@ func load(request:LoadRequest, high_priority:bool = false) -> void:
 			request_queue.push_front(request)
 		else:
 			request_queue.append(request)
+		set_process(true)
 
 
 var target_frame_time:int = 1000/60#TODO: Move these two to the top of the file<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -69,14 +72,16 @@ var last_ticks:float = 0#Needed because delta doesn't seem to work right sometim
 var load_error:int
 func _process(_delta) -> void:#Current limitation: this (single-thread mode) can load at most 1 resource per _process() call
 	if not use_threads:
-		if (not current_request) and request_queue.size() > 0:
-			current_request = request_queue.pop_front()
-			loader = ResourceLoader.load_interactive(
-				current_request.path, current_request.type_hint)
-			if loader == null:
-				_callback_complete(current_request, ResourceLoader.load(current_request.path))
-				current_request = null
-				return
+		if not current_request:
+			if request_queue.size() > 0:
+				current_request = request_queue.pop_front()
+				loader = ResourceLoader.load_interactive(
+					current_request.path, current_request.type_hint)
+				if loader == null:
+					_callback_complete(current_request, ResourceLoader.load(current_request.path))
+					current_request = null
+			else:
+				set_process(false)
 		
 		if current_request:
 			load_error = loader.poll()

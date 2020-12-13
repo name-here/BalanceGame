@@ -24,6 +24,11 @@ _global_script_classes=[ {
 "language": "NativeScript",
 "path": "res://git_api.gdns"
 }, {
+"base": "Sprite",
+"class": "Goal",
+"language": "GDScript",
+"path": "res://Objects/Goal/Goal.gd"
+}, {
 "base": "Node2D",
 "class": "LevelController",
 "language": "GDScript",
@@ -43,6 +48,7 @@ _global_script_class_icons={
 "Character": "",
 "EndScreen": "",
 "GitAPI": "",
+"Goal": "",
 "LevelController": "",
 "RewindOverlay": "",
 "SceneLoader": ""

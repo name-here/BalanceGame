@@ -2,7 +2,7 @@ extends LevelController
 
 
 export(NodePath) var _goal:NodePath
-onready var goal:Sprite = get_node(_goal)
+onready var goal:Goal = get_node(_goal)
 export(NodePath) var _floor_:NodePath
 onready var floor_:StaticBody2D = get_node(_floor_)
 export(NodePath) var _wall:NodePath
@@ -24,6 +24,7 @@ func _on_level_state_changed(new_state:int, last_state:int) -> void:#TODO: Chang
 				camera.global_position.x, goal.global_position.x, completion_anim_times[0], Tween.TRANS_CUBIC)
 		
 		states.NEXT_LEVEL_TRANSITION:
+			goal.emit_particles = false
 			tween.interpolate_property(goal, "fade_color:a",
 				goal.fade_color.a, 0, next_level_anim_time)
 			tween.interpolate_property(goal, "base_color",

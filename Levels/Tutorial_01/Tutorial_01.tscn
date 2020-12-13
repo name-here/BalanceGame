@@ -39,6 +39,7 @@ _wall = NodePath("Geometry/Wall")
 wall_width = 16.0
 
 [node name="Tween" type="Tween" parent="."]
+playback_process_mode = 0
 script = ExtResource( 4 )
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
@@ -56,9 +57,7 @@ scale = Vector2( 16, 768 )
 
 [node name="Goal" parent="Geometry" instance=ExtResource( 8 )]
 material = SubResource( 1 )
-position = Vector2( 864, -32 )
-fade_color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
-base_color = Color( 0.564706, 0.807843, 0.643137, 1 )
+position = Vector2( 863.096, -32 )
 _character = NodePath("../../Character")
 
 [node name="Label" type="Label" parent="Geometry"]

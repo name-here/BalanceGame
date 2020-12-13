@@ -1,13 +1,50 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Objects/Goal/Goal.gd" type="Script" id=1]
 [ext_resource path="res://Objects/Goal/Goal.png" type="Texture" id=2]
-[ext_resource path="res://Materials/Goal/Goal.tres" type="Material" id=3]
+[ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=3]
+[ext_resource path="res://Materials/GoalParticles/GoalParticles.shader" type="Shader" id=4]
+[ext_resource path="res://Objects/Goal/Particles.gd" type="Script" id=5]
+
+[sub_resource type="ShaderMaterial" id=4]
+shader = ExtResource( 3 )
+shader_param/isActive = true
+shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
+shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
+
+[sub_resource type="ShaderMaterial" id=5]
+shader = ExtResource( 4 )
+shader_param/glowColor = Color( 0.372549, 0.890196, 0.537255, 1 )
+
+[sub_resource type="Gradient" id=3]
+offsets = PoolRealArray( 0, 0.24, 1 )
+colors = PoolColorArray( 0.862745, 0.937255, 0.886275, 0, 0.862745, 0.937255, 0.886275, 1, 0.862745, 0.937255, 0.886275, 0 )
 
 [node name="Goal" type="Sprite"]
-material = ExtResource( 3 )
+material = SubResource( 4 )
 position = Vector2( 0, -32 )
 scale = Vector2( 4, 4 )
 texture = ExtResource( 2 )
 script = ExtResource( 1 )
-fade_color = Color( 1, 1, 1, 0.501961 )
+_particles = NodePath("Particles")
+fade_color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
+base_color = Color( 0.564706, 0.807843, 0.643137, 1 )
+particle_color = Color( 0.862745, 0.937255, 0.886275, 1 )
+particle_glow_color = Color( 0.372549, 0.890196, 0.537255, 1 )
+
+[node name="Particles" type="CPUParticles2D" parent="."]
+show_behind_parent = true
+material = SubResource( 5 )
+position = Vector2( 0, 7.25 )
+amount = 24
+emission_shape = 2
+emission_rect_extents = Vector2( 30.5, 15.25 )
+direction = Vector2( 0, -1 )
+spread = 0.0
+gravity = Vector2( 0, 0 )
+initial_velocity = 16.0
+linear_accel = 16.0
+scale_amount = 4.0
+scale_amount_random = 0.5
+color_ramp = SubResource( 3 )
+script = ExtResource( 5 )
