@@ -79,6 +79,6 @@ node_a = NodePath("../..")
 node_b = NodePath("../../../Wheel")
 length = 32.0
 rest_length = 32.0
-stiffness = 200.0
+stiffness = 150.0
 damping = 3.0
 [connection signal="hit_floor" from="Body" to="." method="_on_body_hit_floor"]

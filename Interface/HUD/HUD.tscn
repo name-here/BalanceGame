@@ -60,7 +60,7 @@ __meta__ = {
 
 [node name="Bottom" type="MarginContainer" parent="Frame/Margin"]
 margin_left = 32.0
-margin_top = 928.0
+margin_top = 896.0
 margin_right = 992.0
 margin_bottom = 992.0
 size_flags_horizontal = 3
@@ -68,7 +68,7 @@ size_flags_vertical = 8
 custom_constants/margin_right = 32
 custom_constants/margin_top = 0
 custom_constants/margin_left = 32
-custom_constants/margin_bottom = 0
+custom_constants/margin_bottom = 32
 
 [node name="Torque" parent="Frame/Margin/Bottom" instance=ExtResource( 2 )]
 margin_left = 32.0

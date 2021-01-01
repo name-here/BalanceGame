@@ -5,5 +5,5 @@
 [resource]
 shader = ExtResource( 1 )
 shader_param/isActive = true
-shader_param/fadeColor = Color( 1, 1, 1, 0.501961 )
-shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
+shader_param/fadeColor = Color( 1, 1, 1, 1 )
+shader_param/baseColor = Color( 1, 1, 1, 1 )

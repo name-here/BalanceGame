@@ -1,42 +1,42 @@
 [gd_scene load_steps=19 format=2]
 
-[ext_resource path="res://Levels/Tutorial_02/Tutorial_02.gd" type="Script" id=1]
+[ext_resource path="res://Levels/0001 – Ramp/Tutorial_02.gd" type="Script" id=1]
 [ext_resource path="res://Levels/LevelController/Tween.gd" type="Script" id=2]
-[ext_resource path="res://Levels/Tutorial_02/Polygon.gd" type="Script" id=3]
-[ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=4]
-[ext_resource path="res://Interface/RewindOverlay/RewindOverlay.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=6]
-[ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=7]
-[ext_resource path="res://Levels/Tutorial_02/Floor.gd" type="Script" id=8]
-[ext_resource path="res://Materials/ContrastBackground/ContrastBackground.tres" type="Material" id=9]
-[ext_resource path="res://Materials/FrameOverlay/FrameOverlay.shader" type="Shader" id=10]
-[ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=11]
-[ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=12]
-[ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=13]
-[ext_resource path="res://Character/Character.tscn" type="PackedScene" id=14]
-[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=15]
+[ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=3]
+[ext_resource path="res://Materials/FrameOverlay/FrameOverlay.shader" type="Shader" id=4]
+[ext_resource path="res://Materials/ContrastBackground/ContrastBackground.tres" type="Material" id=5]
+[ext_resource path="res://Objects/PolygonBlock/RampFloor.gd" type="Script" id=6]
+[ext_resource path="res://Character/Character.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Interface/RewindOverlay/RewindOverlay.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Objects/PolygonBlock/PolygonBlock.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=14]
+[ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=15]
 
 [sub_resource type="ShaderMaterial" id=1]
-shader = ExtResource( 4 )
+shader = ExtResource( 3 )
 shader_param/isActive = false
 shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 shader_param/baseColor = Color( 0.498039, 0.498039, 0.498039, 1 )
 
 [sub_resource type="ShaderMaterial" id=2]
-shader = ExtResource( 4 )
+shader = ExtResource( 3 )
 shader_param/isActive = true
 shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
 
 [sub_resource type="ShaderMaterial" id=3]
-shader = ExtResource( 10 )
+shader = ExtResource( 4 )
 shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.0862745 )
 
 [node name="Tutorial_02" type="Node2D"]
 script = ExtResource( 1 )
 _character = NodePath("../Tutorial_02/Character")
 _camera = NodePath("../Tutorial_02/Camera2D")
-_fade_out = [ NodePath("RampCenter/Label") ]
+_fade_out = [ NodePath("RampCenter"), NodePath("HUD/Frame/Margin") ]
 end_position = Vector2( 352, -128 )
 _end_screen = NodePath("../Tutorial_02/HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("../Tutorial_02/HUD/Frame/RewindOverlay")
@@ -44,51 +44,50 @@ _tween = NodePath("../Tutorial_02/Tween")
 _start = NodePath("Geometry/Start")
 _goal = NodePath("../Tutorial_02/Geometry/Goal")
 _wall = NodePath("Geometry/Wall")
-_floor_ = NodePath("../Tutorial_02/Geometry/Floor")
+_floor_ = NodePath("Geometry/RampFloor")
 
 [node name="Tween" type="Tween" parent="."]
 playback_process_mode = 0
 script = ExtResource( 2 )
 
-[node name="BackgroundColor" parent="." instance=ExtResource( 15 )]
+[node name="BackgroundColor" parent="." instance=ExtResource( 14 )]
 color = Color( 0.129412, 0.129412, 0.129412, 1 )
 
 [node name="Geometry" type="Node2D" parent="."]
 
-[node name="Wall" parent="Geometry" instance=ExtResource( 13 )]
-position = Vector2( -504, -384 )
+[node name="Wall" parent="Geometry" instance=ExtResource( 12 )]
+position = Vector2( -512, 0 )
 scale = Vector2( 16, 768 )
 
-[node name="Floor" type="StaticBody2D" parent="Geometry"]
+[node name="RampFloor" parent="Geometry" instance=ExtResource( 11 )]
 collision_layer = 4
 collision_mask = 3
-script = ExtResource( 8 )
-polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 256 )
-_polygon2d = NodePath("Polygon2D")
-_collision_polygon = NodePath("CollisionPolygon2D")
-_ramp_center = NodePath("../../RampCenter")
+script = ExtResource( 6 )
+polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 255 )
+_polygon2d = NodePath("../RampFloor/Polygon2D")
+_collision_polygon = NodePath("../RampFloor/CollisionPolygon2D")
+_ramp_center = NodePath("RemoteTransform2D")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Geometry/Floor"]
-polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 256 )
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Geometry/RampFloor"]
+position = Vector2( 0, -64 )
+rotation = -0.321751
+remote_path = NodePath("../../../RampCenter")
+update_scale = false
 
-[node name="Polygon2D" type="Polygon2D" parent="Geometry/Floor"]
-polygon = PoolVector2Array( -512, 256, -512, 0, -192, 0, 192, -128, 512, -128, 512, 256 )
-script = ExtResource( 3 )
-
-[node name="Start" parent="Geometry" instance=ExtResource( 12 )]
+[node name="Start" parent="Geometry" instance=ExtResource( 13 )]
 material = SubResource( 1 )
-position = Vector2( -352, -32 )
+position = Vector2( -352, 0 )
 is_active = false
 emit_particles = false
 base_color = Color( 0.498039, 0.498039, 0.498039, 1 )
 
-[node name="Goal" parent="Geometry" instance=ExtResource( 12 )]
+[node name="Goal" parent="Geometry" instance=ExtResource( 13 )]
 material = SubResource( 2 )
-position = Vector2( 352, -160 )
-particle_color = Color( 0.862745, 0.937255, 0.886275, 1 )
-_character = NodePath("../../../Tutorial_02/Character")
+position = Vector2( 352, -128 )
+disable_particles_in_editor = true
+_character = NodePath("../../Character")
 
-[node name="Character" parent="." instance=ExtResource( 14 )]
+[node name="Character" parent="." instance=ExtResource( 7 )]
 position = Vector2( -352, -192 )
 _followed = NodePath("../../Tutorial_02/Character/Body")
 _wheel = NodePath("../../Tutorial_02/Character/Wheel")
@@ -99,16 +98,16 @@ do_compress_input = false
 
 [node name="RampCenter" type="Node2D" parent="."]
 position = Vector2( 0, -64 )
-rotation = -0.339837
+rotation = -0.321751
 
 [node name="Label" type="Label" parent="RampCenter"]
-material = ExtResource( 9 )
+material = ExtResource( 5 )
 margin_left = -138.0
 margin_top = -58.0
 margin_right = 138.0
 margin_bottom = 6.0
 grow_horizontal = 2
-theme = ExtResource( 11 )
+theme = ExtResource( 15 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 text = "up here..."
 __meta__ = {
@@ -118,7 +117,7 @@ __meta__ = {
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 0, -256 )
 
-[node name="HUD" parent="." instance=ExtResource( 7 )]
+[node name="HUD" parent="." instance=ExtResource( 8 )]
 
 [node name="Torque" parent="HUD/Frame/Margin/Bottom" index="0"]
 _left_bar = NodePath("../../../../../../Tutorial_02/HUD/Frame/Margin/Bottom/Torque/Left/Left")
@@ -131,20 +130,19 @@ visible = false
 _left_bar = NodePath("../../../../../../../Tutorial_02/HUD/Frame/Margin/Right/Control/Tension/Left/Left")
 _right_bar = NodePath("../../../../../../../Tutorial_02/HUD/Frame/Margin/Right/Control/Tension/Right/Right")
 
-[node name="RewindOverlay" parent="HUD/Frame" index="1" instance=ExtResource( 5 )]
-visible = false
-material = SubResource( 3 )
-color = Color( 0.635294, 0.827451, 0.87451, 0 )
-
-[node name="EndScreen" parent="HUD/Frame" index="2" instance=ExtResource( 6 )]
+[node name="EndScreen" parent="HUD/Frame" index="1" instance=ExtResource( 10 )]
 visible = false
 alpha = 0.0
 _background = NodePath("../../../../Tutorial_02/HUD/Frame/EndScreen/Background")
+
+[node name="RewindOverlay" parent="HUD/Frame" index="2" instance=ExtResource( 9 )]
+visible = false
+material = SubResource( 3 )
+color = Color( 0.635294, 0.827451, 0.87451, 0 )
 [connection signal="restarting" from="." to="." method="_on_level_restarting"]
 [connection signal="state_changed" from="." to="." method="_on_level_state_changed"]
-[connection signal="polygon_changed" from="Geometry/Floor/Polygon2D" to="Geometry/Floor" method="_on_polygon_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
-[connection signal="body_hit_floor" from="Character" to="." method="_on_character_hit_floor"]
+[connection signal="body_hit_floor" from="Character" to="." method="_on_fail"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
 [connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="." method="transition_to_next_level"]
 [connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart" binds= [ 2.0 ]]

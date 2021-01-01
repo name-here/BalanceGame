@@ -4,4 +4,4 @@
 
 [resource]
 shader = ExtResource( 1 )
-shader_param/alternateColor = Plane( 0.129, 0.129, 0.129, 1 )
+shader_param/alternateColor = Color( 0, 0, 0, 1 )

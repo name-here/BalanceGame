@@ -6,7 +6,7 @@ class_name LevelController extends Node2D
 signal state_changed(changed_to, changed_from)
 signal restarting(time)
 
-enum states{#This and the rewind history shouldn't both get called "state"
+enum States{#This and the rewind history shouldn't both get called "state"
 	INACTIVE,
 	PAUSED,
 	PLAYING,
@@ -14,9 +14,9 @@ enum states{#This and the rewind history shouldn't both get called "state"
 	COMPLETE_1,
 	COMPLETE_2,
 	COMPLETE_3,
-	NEXT_LEVEL_TRANSITION
+	NEXT_LEVEL_TRANSITION,
 }
-var state:int = states.INACTIVE setget set_state
+var state:int = States.INACTIVE setget set_state
 
 var scene_loader:SceneLoader = null
 var next_level_loaded := false
@@ -149,7 +149,7 @@ func init_level_state() -> void:
 
 func _process(delta) -> void:
 	match state:
-		states.PLAYING:
+		States.PLAYING:
 			# The following code does (should do) the following:  (needed for rewind effect)
 			# Start by writing character data to the history arrays.
 			# When the whole array has been written, 
@@ -179,15 +179,18 @@ func _process(delta) -> void:
 			#frame_num += 1
 		
 		
-		states.RESTARTING:
+		States.RESTARTING:#TODO: Use _interpolate_state to smooth out playback?  Would allow for slowing it down more or using less storate.  (use rewind_error)
 			if history_length > 0 and rewind_time_left >= 0:
-				var rewind_frame := int( (history_length - 1) * rewind_time_left / rewind_time )
+				var rewind_frame:int = (history_length - 1) * rewind_time_left / rewind_time
+				var rewind_progress:float = float(history_length - 1) * rewind_time_left / rewind_time
+				var rewind_error:float = rewind_progress - rewind_frame
+				#print(rewind_error)
 				if rewind_frame < 0:
 					push_error( str("positions: ", history_length-1, ", time: ", rewind_time_left, ", length: ", rewind_time, ", frame: ", rewind_frame) )
 					assert(rewind_frame >= 0)
 				else:
 					# This plays back the data created above (split between
-					# 2 buffers) in the correct reverse order
+					# 2 buffers) in the correct order
 					if history_is_first_write or rewind_frame >= history_max_length / 2:
 						_read_state(history_buffers[history_active_buffer], rewind_frame)
 					else:
@@ -204,23 +207,22 @@ func _process(delta) -> void:
 				# Loads starting state (should already be done by code above)
 				#_read_state(history_buffers[0], 0)
 				
-				set_state(states.PAUSED)
+				set_state(States.PAUSED)
 				tween.interpolate_property(rewind_overlay, "color:a", rewind_overlay.color.a, 0, 0.5)
 				tween.interpolate_deferred_callback(self, 0.5, "play")
 				tween.start()
-		#states.COMPLETE_2:
+		#States.COMPLETE_2:
 		#	print("stage 2, ", character.body.global_position, ", ", character.wheel.global_position)
 
-
 func next_complete_anim() -> int:
-	if state < states.COMPLETE_1:
-		set_state(states.COMPLETE_1)
-	elif state < states.size() - 1:
+	if state < States.COMPLETE_1:
+		set_state(States.COMPLETE_1)
+	elif state < States.size() - 1:
 		set_state(state + 1)
-	#print("asked for stage ", states.keys()[state])
+	#print("asked for stage ", States.keys()[state])
 	
 	match state:
-		states.COMPLETE_1:
+		States.COMPLETE_1:
 			tween.interpolate_property(Engine, "time_scale",
 				Engine.time_scale, 0, completion_anim_times[0], Tween.TRANS_EXPO, Tween.EASE_OUT)
 			#tween.interpolate_callback(self, completion_anim_times[0], "reset_time_scales")
@@ -232,7 +234,7 @@ func next_complete_anim() -> int:
 			tween.ignore_engine_time_scale = true
 			tween.start()
 		
-		states.COMPLETE_2:
+		States.COMPLETE_2:
 			#reset_time_scales()
 			set_physics(false)
 			tween.remove_all()
@@ -254,29 +256,32 @@ func next_complete_anim() -> int:
 				0, 1, completion_anim_times[1], Tween.TRANS_CUBIC)
 			tween.interpolate_callback(self, completion_anim_times[1], "next_complete_anim")
 			tween.start()
-		states.COMPLETE_3:
+		States.COMPLETE_3:
 			end_screen.active = true
 	
 	return state
 
 
 func play() -> void:
+	print("playing")
 	set_physics(true)
-	set_state(states.PLAYING)
+	set_state(States.PLAYING)
 
 func pause() -> void:
+	print("pausing")
 	set_physics(false)
-	set_state(states.PAUSED)
+	set_state(States.PAUSED)
 
 func stop() -> void:
+	print("stopping")
 	set_physics(false)
-	set_state(states.INACTIVE)
+	set_state(States.INACTIVE)
 
 func restart(time:float = 1, override:bool = false) -> void:
 	if time <= 0:
 		assert(time > 0)
 		time = 1.0
-	if override or state == states.PLAYING:
+	if override or state == States.PLAYING:
 		set_physics(false)
 		emit_signal("restarting", time)
 		character.body.angular_velocity = 0
@@ -287,11 +292,11 @@ func restart(time:float = 1, override:bool = false) -> void:
 		rewind_time_left = rewind_time
 		tween.interpolate_property(rewind_overlay, "color:a", 0, 0.15, 0.1)
 		tween.start()
-		set_state(states.RESTARTING)
+		set_state(States.RESTARTING)
 	else:
 		match state:
-			states.COMPLETE_3:
-				set_state(states.PAUSED)
+			States.COMPLETE_3:
+				set_state(States.PAUSED)
 				end_screen.active = false
 				tween.interpolate_method(end_screen, "set_alpha",
 					1, 0, time/2, Tween.TRANS_EXPO, Tween.EASE_OUT)
@@ -314,7 +319,7 @@ func transition_to_next_level() -> void:
 		return
 	
 	end_screen.active = false
-	set_state(states.NEXT_LEVEL_TRANSITION)
+	set_state(States.NEXT_LEVEL_TRANSITION)
 	
 	_write_state(transition_state_buffer, 0)
 	character.body.global_position = end_position + Vector2(0, -192)
@@ -360,7 +365,10 @@ func set_physics(value:bool) -> void:
 func set_active(value := true) -> void:
 	if value:
 		camera.make_current()
-		character.update_mouse(get_viewport().get_mouse_position())
+		if character.input_type==character.InputTypes.MOUSE:
+			
+			get_viewport().warp_mouse(get_viewport_rect().size / 2)
+		#character.update_input(get_viewport().get_mouse_position())
 		play()
 	else:
 		stop()
@@ -381,23 +389,27 @@ func set_fade_out_alpha(alpha:float) -> void:
 
 
 func _on_goal_entered() -> void:
-	if state == states.PLAYING:
+	if state == States.PLAYING:
 		call_deferred("next_complete_anim")
 
-func _on_character_hit_floor(collision_position:Vector2, collision_normal:Vector2) -> void:
-	#TODO: emit particles and play sound, or whatever<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+func _on_fail() -> void:
 	restart(1)
 
 
 func _input(event) -> void:
-	if event.is_action_pressed("reset_level"):
-		#print(states.keys()[state])
+	if event.is_action_pressed("restart_level"):
+		#print(States.keys()[state])
 		match state:
-			states.PLAYING:
+			States.PLAYING:
 				restart(0.5)
-			states.COMPLETE_3:
+			States.COMPLETE_3:
 				restart(2)
-	elif event.is_action_pressed("toggle_fullscreen"):
+	elif event.is_action_pressed("ui_accept"):
+		if state == States.COMPLETE_3:
+			transition_to_next_level()
+
+func _unhandled_key_input(event):
+	if event.is_action_pressed("toggle_fullscreen"):
 		OS.window_fullscreen = !OS.window_fullscreen
-	elif event.is_action_pressed("toggle_fullscreen"):
+	elif event.is_action_pressed("exit_fullscreen"):
 		OS.window_fullscreen = false
