@@ -1,0 +1,130 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://Character/Character.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Materials/FrameOverlay/FrameOverlay.shader" type="Shader" id=2]
+[ext_resource path="res://Objects/Goal/Goal.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Objects/Floor/Floor.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/Levels/0001/Level.gd" type="Script" id=5]
+[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Objects/Wall/Wall.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=8]
+[ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Materials/ContrastBackground/ContrastBackground.shader" type="Shader" id=10]
+[ext_resource path="res://Scenes/Levels/LevelController/Tween.gd" type="Script" id=11]
+[ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Themes/DefaultTheme.tres" type="Theme" id=13]
+[ext_resource path="res://Interface/RewindOverlay/RewindOverlay.tscn" type="PackedScene" id=14]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 8 )
+shader_param/isActive = true
+shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
+shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = ExtResource( 10 )
+shader_param/alternateColor = Color( 0.129412, 0.129412, 0.129412, 1 )
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = ExtResource( 2 )
+shader_param/color = Color( 0.635294, 0.827451, 0.87451, 0.32549 )
+
+[node name="Tutorial_01" type="Node2D"]
+script = ExtResource( 5 )
+_character = NodePath("Character")
+_camera = NodePath("Camera2D")
+_fade_out = [ NodePath("HUD/Frame/Margin"), NodePath("Geometry/Label"), NodePath("Character/Label") ]
+end_position = Vector2( 352, 0 )
+_end_screen = NodePath("HUD/Frame/EndScreen")
+_rewind_overlay = NodePath("HUD/Frame/RewindOverlay")
+_tween = NodePath("Tween")
+_goal = NodePath("Geometry/Goal")
+_floor_ = NodePath("Geometry/Floor")
+_wall = NodePath("Geometry/Wall")
+wall_width = 16.0
+
+[node name="Tween" type="Tween" parent="."]
+playback_process_mode = 0
+script = ExtResource( 11 )
+
+[node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
+color = Color( 0.129412, 0.129412, 0.129412, 1 )
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="Wall" parent="Geometry" instance=ExtResource( 7 )]
+position = Vector2( -512, 0 )
+scale = Vector2( 16, 768 )
+
+[node name="Floor" parent="Geometry" instance=ExtResource( 4 )]
+position = Vector2( -512, 0 )
+scale = Vector2( 2048, 256 )
+
+[node name="Goal" parent="Geometry" instance=ExtResource( 3 )]
+material = SubResource( 1 )
+position = Vector2( 352, 0 )
+disable_particles_in_editor = true
+_character = NodePath("../../Character")
+
+[node name="Label" type="Label" parent="Geometry"]
+margin_left = 352.0
+margin_top = 64.0
+margin_right = 352.0
+margin_bottom = 64.0
+grow_horizontal = 2
+theme = ExtResource( 13 )
+custom_colors/font_color = Color( 0.129412, 0.129412, 0.129412, 1 )
+text = "get here."
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Character" parent="." instance=ExtResource( 1 )]
+position = Vector2( -340, -192 )
+do_compress_input = false
+
+[node name="Label" type="Label" parent="Character"]
+material = SubResource( 2 )
+margin_left = -136.0
+margin_top = -214.0
+margin_right = 136.0
+margin_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource( 13 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "stay
+balanced."
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 0, -256 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="HUD" parent="." instance=ExtResource( 9 )]
+
+[node name="Right" parent="HUD/Frame/Margin" index="1"]
+visible = false
+
+[node name="EndScreen" parent="HUD/Frame" index="1" instance=ExtResource( 12 )]
+visible = false
+alpha = 0.0
+
+[node name="RewindOverlay" parent="HUD/Frame" index="2" instance=ExtResource( 14 )]
+visible = false
+material = SubResource( 3 )
+color = Color( 0.635294, 0.827451, 0.87451, 0 )
+[connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
+[connection signal="body_hit_floor" from="Character" to="." method="_on_fail"]
+[connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]
+[connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
+[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="." method="transition_to_next_level"]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart" binds= [ 2.0 ]]
+
+[editable path="HUD"]

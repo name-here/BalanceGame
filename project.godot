@@ -37,7 +37,17 @@ _global_script_classes=[ {
 "base": "Node2D",
 "class": "LevelController",
 "language": "GDScript",
-"path": "res://Levels/LevelController/LevelController.gd"
+"path": "res://Scenes/Levels/LevelController/LevelController.gd"
+}, {
+"base": "Resource",
+"class": "LevelData",
+"language": "GDScript",
+"path": "res://Scenes/Levels/LevelData.gd"
+}, {
+"base": "Resource",
+"class": "LevelList",
+"language": "GDScript",
+"path": "res://Scenes/Levels/LevelList.gd"
 }, {
 "base": "StaticBody2D",
 "class": "PolygonBlock",
@@ -52,7 +62,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "SceneLoader",
 "language": "GDScript",
-"path": "res://Levels/SceneLoader/SceneLoader.gd"
+"path": "res://Scenes/SceneLoader/SceneLoader.gd"
 } ]
 _global_script_class_icons={
 "Character": "",
@@ -61,6 +71,8 @@ _global_script_class_icons={
 "GitAPI": "",
 "Goal": "",
 "LevelController": "",
+"LevelData": "",
+"LevelList": "",
 "PolygonBlock": "",
 "RewindOverlay": "",
 "SceneLoader": ""
@@ -69,7 +81,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Balance Game"
-run/main_scene="res://Levels/SceneLoader/SceneLoader.tscn"
+run/main_scene="res://Scenes/SceneLoader/SceneLoader.tscn"
 config/icon="res://Icon/Icon_256.png"
 config/macos_native_icon="res://Icon/Exported/balance.icns"
 config/windows_native_icon="res://Icon/Exported/balance.ico"
@@ -91,6 +103,10 @@ window/size/test_height=1080
 window/dpi/allow_hidpi=true
 window/stretch/mode="2d"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "LevelsDock" )
 
 [gdnative]
 
