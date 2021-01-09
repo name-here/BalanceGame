@@ -1,6 +1,10 @@
-extends Tween
+class_name BetterTween extends Tween
 
 export(bool) var ignore_engine_time_scale := false
+
+
+func _init():
+	playback_process_mode = Tween.TWEEN_PROCESS_PHYSICS
 
 
 # This code makes tweening Engine.time_scale work.

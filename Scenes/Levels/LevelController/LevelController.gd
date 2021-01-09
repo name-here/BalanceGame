@@ -38,8 +38,7 @@ export(NodePath) var _rewind_overlay:NodePath
 onready var rewind_overlay:RewindOverlay = get_node(_rewind_overlay)
 
 # TODO: made things more error tolerant.  For example, things will very much break if tween is null <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-export(NodePath) var _tween:NodePath
-onready var tween:Tween = get_node(_tween)
+var tween:BetterTween
 
 export(Array, float) var completion_anim_times := [1.5, 1.0]
 export(float) var next_level_anim_time:float = 1
@@ -124,6 +123,9 @@ func _copy_state(from_buffer:Array, from_index:int, to_buffer:Array, to_index:in
 
 
 func _ready() -> void:
+	tween = BetterTween.new()
+	add_child(tween)
+	
 	for time in completion_anim_times:
 		assert(time > 0)
 	
@@ -179,7 +181,7 @@ func _process(delta) -> void:
 			#frame_num += 1
 		
 		
-		States.RESTARTING:#TODO: Use _interpolate_state to smooth out playback?  Would allow for slowing it down more or using less storate.  (use rewind_error)
+		States.RESTARTING:#TODO: Use _interpolate_state to smooth out playback?  Would allow for slowing it down more or using less storage.  (use rewind_error)
 			if history_length > 0 and rewind_time_left >= 0:
 				var rewind_frame:int = (history_length - 1) * rewind_time_left / rewind_time
 				var rewind_progress:float = float(history_length - 1) * rewind_time_left / rewind_time
@@ -198,6 +200,7 @@ func _process(delta) -> void:
 						
 					rewind_time_left -= delta
 			else:
+				_read_state(history_buffers[history_active_buffer], 0)
 				rewind_time_left = 0
 				history_length = 0
 				history_wait_frames = 1
@@ -337,7 +340,7 @@ func transition_to_next_level() -> void:
 		1, 0, next_level_anim_time, Tween.TRANS_EXPO, Tween.EASE_OUT)
 	
 	scene_loader.connect("scene_loaded", self, "_on_next_level_loaded")
-	scene_loader.load_scene_async(scene_loader.current_scene_index + 1)
+	scene_loader.load_next_level()
 	tween.interpolate_deferred_callback(self, next_level_anim_time, "_on_level_transition_complete")
 	tween.start()
 

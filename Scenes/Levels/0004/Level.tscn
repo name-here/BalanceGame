@@ -9,7 +9,7 @@
 [ext_resource path="res://Materials/Goal/Goal.shader" type="Shader" id=7]
 [ext_resource path="res://Interface/HUD/HUD.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Materials/ContrastBackground/ContrastBackground.shader" type="Shader" id=9]
-[ext_resource path="res://Scenes/Levels/LevelController/Tween.gd" type="Script" id=10]
+[ext_resource path="res://Interface/BackgroundColor/BackgroundColor.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Scenes/Levels/0004/FloorLeft.gd" type="Script" id=11]
 [ext_resource path="res://Interface/EndScreen/EndScreen.tscn" type="PackedScene" id=12]
 [ext_resource path="res://Objects/DeathPit/DeathPit.tscn" type="PackedScene" id=13]
@@ -43,7 +43,7 @@ shader_param/alternateColor = Color( 0.129412, 0.129412, 0.129412, 1 )
 shader = ExtResource( 2 )
 shader_param/color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 
-[node name="Tutorial_04" type="Node2D"]
+[node name="Level" type="Node2D"]
 script = ExtResource( 5 )
 _character = NodePath("Character")
 _camera = NodePath("Character/Camera2D")
@@ -51,15 +51,13 @@ _fade_out = [ NodePath("Geometry/Label") ]
 end_position = Vector2( 1792, 0 )
 _end_screen = NodePath("HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("HUD/Frame/RewindOverlay")
-_tween = NodePath("Tween")
 _wall = NodePath("Geometry/Wall")
 _floor_left = NodePath("Geometry/FloorLeft")
 _floor_right = NodePath("Geometry/FloorRight")
 _death_pit = NodePath("Geometry/DeathPit")
 
-[node name="Tween" type="Tween" parent="."]
-playback_process_mode = 0
-script = ExtResource( 10 )
+[node name="BackgroundColor" parent="." instance=ExtResource( 10 )]
+color = Color( 0.129412, 0.129412, 0.129412, 1 )
 
 [node name="Geometry" type="Node2D" parent="."]
 
@@ -80,7 +78,6 @@ scale = Vector2( 896, 256 )
 [node name="Start" parent="Geometry" instance=ExtResource( 3 )]
 material = SubResource( 1 )
 position = Vector2( 512, 0 )
-_particles = NodePath("../Start/Particles")
 is_active = false
 emit_particles = false
 base_color = Color( 0.498039, 0.498039, 0.498039, 1 )
@@ -88,7 +85,6 @@ base_color = Color( 0.498039, 0.498039, 0.498039, 1 )
 [node name="Goal" parent="Geometry" instance=ExtResource( 3 )]
 material = SubResource( 2 )
 position = Vector2( 1792, 0 )
-_particles = NodePath("../Goal/Particles")
 disable_particles_in_editor = true
 _character = NodePath("../../Character")
 

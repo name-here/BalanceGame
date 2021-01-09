@@ -6,7 +6,7 @@ extends Tree
 signal item_moved(from_index, to_index)
 
 
-func get_drag_data(position):
+func get_drag_data(position) -> TreeItem:
 	drop_mode_flags = DROP_MODE_INBETWEEN
 	var selected = get_selected()
 	
@@ -29,10 +29,10 @@ func get_drag_data(position):
 	
 	return selected
 
-func can_drop_data(position, data):
+func can_drop_data(position, data) -> bool:
 	return data is TreeItem
 
-func drop_data(position, data):
+func drop_data(position, data) -> void:
 	var destination:TreeItem = get_item_at_position(position)
 	
 	var offset:int = get_drop_section_at_position(position)
@@ -56,7 +56,7 @@ func drop_data(position, data):
 	move_tree_item(data, destination.get_meta("index"))
 
 
-func move_tree_item(item:TreeItem, to_index:int = -1):
+func move_tree_item(item:TreeItem, to_index:int = -1) -> void:
 	var from_index:int = item.get_meta("index")
 	if from_index <= to_index:
 		to_index -= 1

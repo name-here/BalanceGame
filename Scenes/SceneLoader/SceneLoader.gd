@@ -20,9 +20,10 @@ func _ready() -> void:
 	load_scene(starting_scene)
 
 func load_scene(index:int) -> void:
-	loading_scene_index = index
 	if index >= 0 and index < level_list.levels_ordered.size():
-		var scene:PackedScene = level_list.levels_ordered[index].level_data.scene
+		loading_scene_index = index
+		var scene:PackedScene = load(
+			(level_list.levels_ordered[index] as LevelData).scene_path )
 		if scene != null:
 			loading_scene = scene.instance()
 			call_deferred("_switch_scene")
@@ -32,12 +33,22 @@ func load_scene(index:int) -> void:
 	else:
 		push_error("Error: Invalid index %d given for loading scene.  There are only %d scenes." % \
 			[index, level_list.levels_ordered.size()])
+		print(level_list.levels_ordered)
+
+func load_next_level() -> void:
+	var index:int = current_scene_index + 1
+	while not level_list.levels_ordered[index].is_active:
+		index += 1
+		if index >= level_list.levels_ordered.size():
+			return#Should maybe return something to say if it was successful?
+	print("loading ", index)
+	load_scene_async(index)
 
 func load_scene_async(index:int) -> void:
 	is_loading = true
 	loading_scene_index = index
 	var request := AsyncLoader.LoadRequest.new(
-			level_list.levels_ordered[index].level_data.scene.resource_path, "PackedScene",
+			level_list.levels_ordered[index].scene_path, "PackedScene",
 			funcref(self, "_scene_loaded"), funcref(self, "_update_progress") )
 	AsyncLoader.load(request)
 
@@ -64,7 +75,7 @@ func _scene_loaded(scene) -> void:
 	if scene != null:
 		call_deferred("_update_loading_scene", scene.instance())
 	else:
-		push_error("Error: Could not load scene from specified path \"%s\"." % \
+		call_deferred("push_error", "Error: Could not load scene from specified path \"%s\"." % \
 			level_list.levels_ordered[loading_scene_index].level_data.scene.resource_path)
 
 func _update_loading_scene(scene_instance) -> void:#should only ever be called deferred
