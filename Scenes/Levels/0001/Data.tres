@@ -6,3 +6,4 @@
 script = ExtResource( 1 )
 name = "Level 0"
 scene_path = "res://Scenes/Levels/0001/Level.tscn"
+is_active = true

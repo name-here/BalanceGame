@@ -6,3 +6,4 @@
 script = ExtResource( 2 )
 name = "Ramp"
 scene_path = "res://Scenes/Levels/0002/Level.tscn"
+is_active = true

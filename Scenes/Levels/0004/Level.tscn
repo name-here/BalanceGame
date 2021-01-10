@@ -118,6 +118,7 @@ do_compress_input = false
 
 [node name="Camera2D" type="Camera2D" parent="Character"]
 position = Vector2( 0, -64 )
+process_mode = 0
 limit_left = 0
 limit_bottom = 256
 
@@ -130,38 +131,6 @@ visible = false
 visible = false
 alpha = 0.0
 
-[node name="MarginContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="0"]
-margin_bottom = 292.0
-
-[node name="CompletedText" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="0"]
-visible = false
-
-[node name="VBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="1"]
-visible = true
-margin_bottom = 292.0
-
-[node name="MarginContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" index="1"]
-margin_top = 142.0
-margin_right = 960.0
-margin_bottom = 292.0
-
-[node name="ComeBackLater2" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/MarginContainer" index="0"]
-margin_right = 960.0
-margin_bottom = 150.0
-
-[node name="HBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="1"]
-margin_top = 300.0
-margin_bottom = 460.0
-
-[node name="Replay" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 1024.0
-
-[node name="Button" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer/Replay" index="0"]
-margin_right = 1016.0
-
-[node name="Continue" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="1"]
-visible = false
-
 [node name="RewindOverlay" parent="HUD/Frame" index="2" instance=ExtResource( 17 )]
 visible = false
 material = SubResource( 5 )
@@ -170,8 +139,7 @@ color = Color( 0.635294, 0.827451, 0.87451, 0 )
 [connection signal="pit_entered" from="Geometry/DeathPit" to="." method="_on_fail"]
 [connection signal="body_hit_floor" from="Character" to="." method="_on_fail"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
-[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart_game"]
+[connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="." method="transition_to_next_level"]
+[connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart" binds= [ 2.0 ]]
 
 [editable path="HUD"]
-
-[editable path="HUD/Frame/EndScreen"]

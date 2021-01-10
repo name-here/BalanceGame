@@ -114,6 +114,8 @@ alpha = 0.0
 visible = false
 material = SubResource( 3 )
 color = Color( 0.635294, 0.827451, 0.87451, 0 )
+[connection signal="restarting" from="." to="." method="_on_level_restarting"]
+[connection signal="state_changed" from="." to="." method="_on_level_state_changed"]
 [connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="." method="_on_fail"]
 [connection signal="character_tension_changed" from="Character" to="HUD" method="_set_tension"]

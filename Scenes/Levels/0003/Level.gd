@@ -48,18 +48,18 @@ func set_active(value := true) -> void:
 		var time:float = intro_anim_time * 2/3
 		for element in fade_in:
 			element.modulate.a = 0
-		wall.global_position.x = -512#-get_viewport_rect().size.x / 2
 		tween.interpolate_property(wall, "global_position:x",
-			wall.global_position.x, wall.global_position.x + 64,
+			0, wall.global_position.x,
 			time, Tween.TRANS_CUBIC, Tween.EASE_OUT)
+		wall.global_position.x = 0
 		tween.interpolate_property(start, "global_position:x",
-			window_size.x/2 - 512, start.global_position.x, time, Tween.TRANS_CUBIC)
-		start.global_position.x = window_size.x/2 - 512
+			window_size.x/2, start.global_position.x, time, Tween.TRANS_CUBIC)
+		start.global_position.x = window_size.x/2
 		tween.interpolate_property(character, "global_position:x",
-			window_size.x/2 - 512, character.global_position.x, time, Tween.TRANS_CUBIC)
-		character.global_position.x = window_size.x/2 - 512
+			start.global_position.x, character.global_position.x, time, Tween.TRANS_CUBIC)
+		character.global_position.x = start.global_position.x
 		tween.interpolate_property(goal, "global_position:x",
-			window_size.x - 512 + 128, goal.global_position.x,
+			window_size.x + 128, goal.global_position.x,
 			time, Tween.TRANS_CUBIC)
 		goal.global_position.x = window_size.x / 2 + goal.global_position.x / 2#Global_position seems like the wrong thing to use here<<<<<<<<<<<<
 		tween.interpolate_callback(self, intro_anim_time - time, "_intro_anim_part_2", intro_anim_time/2)
@@ -83,7 +83,8 @@ func _on_level_state_changed(new_state:int, last_state:int) -> void:
 		States.COMPLETE_1:
 			pass#camera.drag_margin_v_enabled = false
 		States.NEXT_LEVEL_TRANSITION:
-			pass
+			if scene_loader:
+				scene_loader.load_scene(scene_loader.get_next_valid_index(0))
 
 func _on_level_restarting(time:int) -> void:
 	pass#camera.drag_margin_v_enabled = false
@@ -97,5 +98,5 @@ func _on_window_resize() -> Vector2:
 	#floor_.scale.x = 2048 + new_size.x
 	floor_.scale = Vector2(2048 + new_size.x, new_size.y / 2)
 	#floor_.global_position.x = -new_size.x
-	camera.limit_bottom = new_size.y / 2 - 256
+	camera.limit_bottom = int(new_size.y / 2 - 256)
 	return new_size

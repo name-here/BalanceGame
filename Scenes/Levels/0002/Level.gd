@@ -10,6 +10,9 @@ onready var wall:StaticBody2D = get_node(_wall)
 export(NodePath) var _floor_:NodePath
 onready var floor_:StaticBody2D = get_node(_floor_)
 
+export(NodePath) var _ramp_text:NodePath
+onready var ramp_text:Node2D = get_node(_ramp_text)
+
 export(float) var intro_anim_time:float = 3
 
 
@@ -20,15 +23,15 @@ func set_active(value := true) -> void:
 	var window_size:Vector2 = _on_window_resize()
 	pause()
 	
-	floor_.ramp_center.modulate.a = 0
+	ramp_text.modulate.a = 0
 	var ramp_height = floor_.get_ramp_end_height()
 	floor_.set_ramp_end_height(0)
 	goal.global_position.y = 0
 	
 	tween.interpolate_property(wall, "global_position:x",
-		-wall.global_position.x - window_size.x, wall.global_position.x,
+		wall.global_position.x - wall.global_scale.x, wall.global_position.x,
 		intro_anim_time / 2, Tween.TRANS_CUBIC)
-	wall.global_position.x = -wall.global_position.x - window_size.x
+	wall.global_position.x -= wall.global_scale.x
 	tween.interpolate_property(start, "global_position:x",
 		0, start.global_position.x, intro_anim_time / 3, Tween.TRANS_CUBIC)
 	start.global_position.x = 0
@@ -48,7 +51,7 @@ func _intro_anim_part_2(time:float, final_height:float) -> void:
 		goal.global_position.y, final_height, time, Tween.TRANS_CUBIC)
 	tween.interpolate_method(floor_, "set_ramp_end_height", 0, final_height,
 		time, Tween.TRANS_CUBIC)
-	tween.interpolate_property(floor_.ramp_center, "modulate:a", 0, 1,
+	tween.interpolate_property(ramp_text, "modulate:a", 0, 1,
 		time, Tween.TRANS_CUBIC, Tween.EASE_IN)#These fade-ins should really be happening in LevelController <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	tween.interpolate_callback(self, time, "_on_intro_anim_done")
 	tween.start()

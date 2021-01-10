@@ -43,6 +43,7 @@ _start = NodePath("Geometry/Start")
 _goal = NodePath("Geometry/Goal")
 _wall = NodePath("Geometry/Wall")
 _floor_ = NodePath("Geometry/RampFloor")
+_ramp_text = NodePath("RampCenter")
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 5 )]
 color = Color( 0.129412, 0.129412, 0.129412, 1 )

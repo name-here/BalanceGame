@@ -23,6 +23,7 @@ func _on_level_state_changed(new_state:int, last_state:int) -> void:#TODO: Chang
 			tween.interpolate_property(camera, "global_position:x",
 				camera.global_position.x, goal.global_position.x,
 				completion_anim_times[0], Tween.TRANS_CUBIC)
+			tween.start()
 		
 		States.NEXT_LEVEL_TRANSITION:
 			goal.emit_particles = false

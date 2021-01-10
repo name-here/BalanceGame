@@ -21,15 +21,10 @@ func set_active(value := true) -> void:
 		get_viewport().connect("size_changed", self, "_on_window_resize")
 
 
-func restart_game() -> void:
-	if scene_loader:
-		scene_loader.load_scene(0)
-
-
 func _on_window_resize() -> void:
 	var new_size:Vector2 = get_viewport_rect().size
 	wall.scale.y = new_size.y
 	floor_left.set_height(new_size.y / 2)
 	floor_right.scale = Vector2(new_size.x + 448, new_size.y / 2)
 	death_pit.scale.y = (new_size.y / 2 - 255) / 64
-	camera.limit_bottom = new_size.y / 2 - 256
+	camera.limit_bottom = int(new_size.y / 2 - 256)

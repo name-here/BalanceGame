@@ -17,7 +17,21 @@ var progress:float
 
 
 func _ready() -> void:
-	load_scene(starting_scene)
+	var load_index:int = get_next_valid_index(0)
+	if load_index >= 0:
+		load_scene(load_index)
+	else:
+		push_error("Error: No enabled levels found.")
+
+func get_next_valid_index(current_index:int) -> int:
+	if current_index < level_list.levels_ordered.size():
+		while not level_list.levels_ordered[current_index].is_active:
+			current_index += 1
+			if current_index >= level_list.levels_ordered.size():
+				return -1
+		return current_index
+	else:
+		return -1
 
 func load_scene(index:int) -> void:
 	if index >= 0 and index < level_list.levels_ordered.size():
@@ -33,24 +47,25 @@ func load_scene(index:int) -> void:
 	else:
 		push_error("Error: Invalid index %d given for loading scene.  There are only %d scenes." % \
 			[index, level_list.levels_ordered.size()])
-		print(level_list.levels_ordered)
 
 func load_next_level() -> void:
-	var index:int = current_scene_index + 1
-	while not level_list.levels_ordered[index].is_active:
-		index += 1
-		if index >= level_list.levels_ordered.size():
-			return#Should maybe return something to say if it was successful?
-	print("loading ", index)
-	load_scene_async(index)
+	var load_index:int = get_next_valid_index(current_scene_index+1)
+	if load_index >= 0:
+		load_scene_async(load_index)
+	else:
+		push_error("Error: There are no enabled levels after the current one.")
 
 func load_scene_async(index:int) -> void:
-	is_loading = true
-	loading_scene_index = index
-	var request := AsyncLoader.LoadRequest.new(
-			level_list.levels_ordered[index].scene_path, "PackedScene",
-			funcref(self, "_scene_loaded"), funcref(self, "_update_progress") )
-	AsyncLoader.load(request)
+	if index >= 0 and index < level_list.levels_ordered.size():
+		is_loading = true
+		loading_scene_index = index
+		var request := AsyncLoader.LoadRequest.new(
+				level_list.levels_ordered[index].scene_path, "PackedScene",
+				funcref(self, "_scene_loaded"), funcref(self, "_update_progress") )
+		AsyncLoader.load(request)
+	else:
+		push_error("Error: Invalid index %d given for loading scene.  There are only %d scenes." % \
+			[index, level_list.levels_ordered.size()])
 
 #Switches to loading_scene 
 func _switch_scene() -> void:#must always be called deferred, or probably won't work

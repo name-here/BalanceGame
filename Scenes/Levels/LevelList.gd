@@ -3,6 +3,7 @@ tool
 class_name LevelList extends Resource
 
 
+# The ignore setgets make saving the resource not work
 export(Dictionary) var levels_dict := {}# setget _ignore
 export(Array) var levels_ordered := []# setget _ignore
 
@@ -48,6 +49,6 @@ func clear_levels() -> void:
 	levels_dict = {}
 	levels_ordered = []
 
-func _ignore(_data) -> void:
-	push_error("Thou shalt not write to this directly.  Use add_level(), remove_level(), move_level(), and clear_levels() instead.")
-	pass
+#func _ignore(_data) -> void:
+#	push_error("Thou shalt not write to this directly.  Use add_level(), remove_level(), move_level(), and clear_levels() instead.")
+#	pass

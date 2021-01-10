@@ -81,7 +81,6 @@ func add_item(level_data:LevelData) -> void:
 
 
 func _on_item_edited() -> void:
-	print("edited")
 	var item:TreeItem = tree.get_edited()
 	var data:LevelData = item.get_meta("level_data")
 	data.name = item.get_text(1)

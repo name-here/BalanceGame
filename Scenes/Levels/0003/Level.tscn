@@ -43,6 +43,7 @@ _start = NodePath("Geometry/Start")
 _goal = NodePath("Geometry/Goal")
 _wall = NodePath("Geometry/Wall")
 _floor_ = NodePath("Geometry/Floor")
+_fade_in = [ NodePath("LabelOrigin"), NodePath("Geometry/Arrows") ]
 intro_anim_time = 2.0
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 6 )]
@@ -121,7 +122,7 @@ do_compress_input = false
 [node name="Camera2D" type="Camera2D" parent="Character"]
 position = Vector2( 0, -64 )
 process_mode = 0
-limit_left = -512
+limit_left = 0
 limit_bottom = 256
 drag_margin_top = 1.0
 drag_margin_bottom = 1.0
@@ -157,8 +158,44 @@ __meta__ = {
 visible = false
 
 [node name="EndScreen" parent="HUD/Frame" index="1" instance=ExtResource( 12 )]
-visible = false
 alpha = 0.0
+
+[node name="MarginContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="0"]
+margin_bottom = 292.0
+
+[node name="CompletedText" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="0"]
+visible = false
+
+[node name="VBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer" index="1"]
+visible = true
+margin_bottom = 292.0
+
+[node name="MarginContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" index="1"]
+margin_top = 142.0
+margin_right = 960.0
+margin_bottom = 292.0
+
+[node name="ComeBackLater2" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/MarginContainer" index="0"]
+margin_right = 960.0
+margin_bottom = 150.0
+
+[node name="HBoxContainer" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer" index="1"]
+margin_top = 300.0
+margin_bottom = 460.0
+
+[node name="Replay" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="0"]
+visible = false
+margin_right = 1024.0
+
+[node name="Button" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer/Replay" index="0"]
+margin_right = 1016.0
+
+[node name="Continue" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 0.0
+
+[node name="Button" parent="HUD/Frame/EndScreen/MarginContainer/VBoxContainer/HBoxContainer/Continue" index="0"]
+margin_right = 1008.0
+text = "[play again]"
 
 [node name="RewindOverlay" parent="HUD/Frame" index="2" instance=ExtResource( 15 )]
 visible = false
@@ -173,3 +210,5 @@ color = Color( 0.635294, 0.827451, 0.87451, 0 )
 [connection signal="restart_pressed" from="HUD/Frame/EndScreen" to="." method="restart" binds= [ 2.0 ]]
 
 [editable path="HUD"]
+
+[editable path="HUD/Frame/EndScreen"]
