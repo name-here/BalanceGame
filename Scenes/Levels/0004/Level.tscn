@@ -19,21 +19,21 @@
 [ext_resource path="res://Interface/RewindOverlay/RewindOverlay.tscn" type="PackedScene" id=17]
 
 [sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 14 )
+shader_param/color1 = Color( 0, 0, 0, 1 )
+shader_param/color2 = Color( 1, 0, 0, 1 )
+
+[sub_resource type="ShaderMaterial" id=2]
 shader = ExtResource( 7 )
 shader_param/isActive = false
 shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 shader_param/baseColor = Color( 0.498039, 0.498039, 0.498039, 1 )
 
-[sub_resource type="ShaderMaterial" id=2]
+[sub_resource type="ShaderMaterial" id=3]
 shader = ExtResource( 7 )
 shader_param/isActive = true
 shader_param/fadeColor = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 shader_param/baseColor = Color( 0.564706, 0.807843, 0.643137, 1 )
-
-[sub_resource type="ShaderMaterial" id=3]
-shader = ExtResource( 14 )
-shader_param/color1 = Color( 0, 0, 0, 1 )
-shader_param/color2 = Color( 1, 0, 0, 1 )
 
 [sub_resource type="ShaderMaterial" id=4]
 shader = ExtResource( 9 )
@@ -47,14 +47,20 @@ shader_param/color = Color( 0.580392, 0.831373, 0.658824, 0.337255 )
 script = ExtResource( 5 )
 _character = NodePath("Character")
 _camera = NodePath("Character/Camera2D")
-_fade_out = [ NodePath("Geometry/Label") ]
+_fade_out = [ NodePath("Geometry/Label"), NodePath("HUD/Frame/Margin") ]
 end_position = Vector2( 1792, 0 )
 _end_screen = NodePath("HUD/Frame/EndScreen")
 _rewind_overlay = NodePath("HUD/Frame/RewindOverlay")
+_start = NodePath("Geometry/Start")
+_goal = NodePath("Geometry/Goal")
 _wall = NodePath("Geometry/Wall")
 _floor_left = NodePath("Geometry/FloorLeft")
 _floor_right = NodePath("Geometry/FloorRight")
 _death_pit = NodePath("Geometry/DeathPit")
+_pit_text = NodePath("Geometry/Label")
+intro_anim_time = 3.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 
 [node name="BackgroundColor" parent="." instance=ExtResource( 10 )]
 color = Color( 0.129412, 0.129412, 0.129412, 1 )
@@ -65,33 +71,33 @@ color = Color( 0.129412, 0.129412, 0.129412, 1 )
 position = Vector2( 64, 0 )
 scale = Vector2( -64, 768 )
 
+[node name="DeathPit" parent="Geometry" instance=ExtResource( 13 )]
+material = SubResource( 1 )
+position = Vector2( 960, 0 )
+region_rect = Rect2( 0, 0, 96, 64 )
+_character = NodePath("../../Character")
+
+[node name="FloorRight" parent="Geometry" instance=ExtResource( 4 )]
+position = Vector2( 1344, 0 )
+scale = Vector2( 896, 256 )
+
 [node name="FloorLeft" parent="Geometry" instance=ExtResource( 15 )]
 collision_layer = 4
 collision_mask = 3
 script = ExtResource( 11 )
 polygon = PoolVector2Array( 0, 256, 0, 0, 704, 0, 960, -64, 960, 256 )
 
-[node name="FloorRight" parent="Geometry" instance=ExtResource( 4 )]
-position = Vector2( 1344, 0 )
-scale = Vector2( 896, 256 )
-
 [node name="Start" parent="Geometry" instance=ExtResource( 3 )]
-material = SubResource( 1 )
+material = SubResource( 2 )
 position = Vector2( 512, 0 )
 is_active = false
 emit_particles = false
 base_color = Color( 0.498039, 0.498039, 0.498039, 1 )
 
 [node name="Goal" parent="Geometry" instance=ExtResource( 3 )]
-material = SubResource( 2 )
+material = SubResource( 3 )
 position = Vector2( 1792, 0 )
 disable_particles_in_editor = true
-_character = NodePath("../../Character")
-
-[node name="DeathPit" parent="Geometry" instance=ExtResource( 13 )]
-material = SubResource( 3 )
-position = Vector2( 960, 0 )
-region_rect = Rect2( 0, 0, 96, 64 )
 _character = NodePath("../../Character")
 
 [node name="Label" type="Label" parent="Geometry"]
@@ -135,8 +141,9 @@ alpha = 0.0
 visible = false
 material = SubResource( 5 )
 color = Color( 0.635294, 0.827451, 0.87451, 0 )
-[connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
+[connection signal="state_changed" from="." to="." method="_on_level_state_changed"]
 [connection signal="pit_entered" from="Geometry/DeathPit" to="." method="_on_fail"]
+[connection signal="goal_entered" from="Geometry/Goal" to="." method="_on_goal_entered"]
 [connection signal="body_hit_floor" from="Character" to="." method="_on_fail"]
 [connection signal="character_torque_changed" from="Character" to="HUD" method="_set_torque"]
 [connection signal="continue_pressed" from="HUD/Frame/EndScreen" to="." method="transition_to_next_level"]
