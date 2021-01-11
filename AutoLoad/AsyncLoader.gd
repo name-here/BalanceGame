@@ -67,7 +67,8 @@ func load(request:LoadRequest, high_priority:bool = false) -> void:
 		set_process(true)
 
 
-var target_frame_time:int = 500#TODO: Move these two to the top of the file?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+var target_frame_time:int = 1000/60#TODO: Move these two to the top of the file?<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+var min_loading_time:int = 10
 var last_ticks:float = 0#Needed because delta doesn't seem to work right sometimes (in 3.2.3)
 var load_error:int
 func _process(_delta) -> void:#Current limitation: this (single-thread mode) can load at most 1 resource per _process() call
@@ -85,7 +86,9 @@ func _process(_delta) -> void:#Current limitation: this (single-thread mode) can
 		
 		if current_request:
 			load_error = loader.poll()
-			while OS.get_ticks_msec() - last_ticks < target_frame_time - 1:
+			var start_ticks:float = OS.get_ticks_msec()
+			while OS.get_ticks_msec() - last_ticks < target_frame_time - 1 or \
+					OS.get_ticks_msec() - start_ticks < min_loading_time:
 				if load_error == OK:
 					load_error = loader.poll()
 				else:
