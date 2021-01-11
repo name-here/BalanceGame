@@ -15,4 +15,4 @@ levels_dict = {
 "Ramp": ExtResource( 4 ),
 "The Pit": ExtResource( 3 )
 }
-levels_ordered = [ ExtResource( 5 ), ExtResource( 4 ), ExtResource( 3 ), ExtResource( 2 ) ]
+levels_ordered = [ ExtResource( 5 ), ExtResource( 4 ), ExtResource( 2 ), ExtResource( 3 ) ]

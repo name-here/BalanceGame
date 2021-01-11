@@ -81,6 +81,10 @@ func _on_level_state_changed(new_state:int, last_state:int) -> void:
 		States.COMPLETE_1:
 			pass
 		States.NEXT_LEVEL_TRANSITION:
+			if scene_loader:
+				scene_loader.load_scene(scene_loader.get_next_valid_index(0))
+			return
+			
 			goal.emit_particles = false
 			tween.interpolate_property(goal, "particle_color:a",
 				goal.particle_color.a, 0, next_level_anim_time)

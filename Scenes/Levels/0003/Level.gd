@@ -83,8 +83,7 @@ func _on_level_state_changed(new_state:int, last_state:int) -> void:
 		States.COMPLETE_1:
 			pass#camera.drag_margin_v_enabled = false
 		States.NEXT_LEVEL_TRANSITION:
-			if scene_loader:
-				scene_loader.load_scene(scene_loader.get_next_valid_index(0))
+			pass
 
 func _on_level_restarting(time:int) -> void:
 	pass#camera.drag_margin_v_enabled = false
